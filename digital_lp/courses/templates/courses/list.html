@@ -1,0 +1,35 @@
+{% extends 'main/index.html' %}
+{% load static %}
+
+{% block content %}
+  <div class="search">
+    <form class="search-form" method="GET" action="{% url 'courses:catalog' %}" id="search-form">
+      <div class="input-container">
+        <input type="text" class="form_input" name="q" placeholder="Search" value="{{ search_query }}" />
+        <button type="submit" class="btnforsearch"><img src="{% static 'img/search.png' %}" /></button>
+      </div>
+    </form>
+  </div>
+
+  <div class="course-list">
+    <div class="container-md">
+      <div class="row row-cols-3">
+        {% for item in course_items %}
+          {% if item.available %}
+            <a href="{% url 'courses:course_detail_view' item.id %}">
+              <div class="col-sm-6">
+                <div class="card">
+                  <img src="{{ item.image.url }}" alt="{{ item.name }}" class="img-course img-thumbnail" />
+                  <div class="card-body">
+                    <h5 class="card-title">{{ item.name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Автор:</h6>
+                  </div>
+                </div>
+              </div>
+            </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
