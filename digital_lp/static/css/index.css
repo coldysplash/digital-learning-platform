@@ -1,0 +1,40 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.content {
+    flex: 1 0 auto;
+}
+
+.header {
+    line-height: 60px;
+    background-color: rgb(55, 90, 150);
+    width: 100%;
+    white-space: nowrap;
+}
+
+.footer {
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px;
+    background-color: rgb(55, 90, 150);
+    flex: 0 0 auto;
+}
+
+.img-course {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+}

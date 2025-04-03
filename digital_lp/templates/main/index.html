@@ -8,16 +8,55 @@
 
     {% comment %}bootstrap{% endcomment %}
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.css' %}" />
+    {% comment %}css{% endcomment %}
+    <link rel="stylesheet" href="{% static 'css/index.css' %}" />
   </head>
   <body>
-    <header></header>
-
-    <div class="container">
-      {% block content %}
-
-      {% endblock %}
+    <div class="header mb-4">
+      <header>
+        <nav class="navbar navbar-expand-sm">
+          <div class="container border-bottom border-top py-2 my-3">
+            <a href="{% url 'courses:catalog' %}" class="navbar-brand text-white">Learning-Platform</a>
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+              <ul class="navbar-nav flex-grow-1">
+                <li class="nav-item ms-auto">
+                  <a href="#" class="nav-link text-white">Вход</a>
+                </li>
+                <li class="nav-item">
+                  <a href="#" class="nav-link text-white">Регистрация</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
     </div>
 
-    <footer></footer>
+    <div class="wrapper">
+      <div class="content">
+        <div class="container">
+          {% block content %}
+
+          {% endblock %}
+        </div>
+      </div>
+
+      <div class="footer">
+        <div class="container">
+          <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+            <p class="col-md-4 mb-0 text-white">© 2025 Learning-Platform, Inc</p>
+
+            <ul class="nav col-md-4 justify-content-end">
+              <li class="nav-item">
+                <a href="#" class="nav-link px-2 text-white">Главная</a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link px-2 text-white">About</a>
+              </li>
+            </ul>
+          </footer>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

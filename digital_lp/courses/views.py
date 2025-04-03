@@ -18,7 +18,9 @@ class CatalogView(ListView):
 
         if search_query:
             queryset = queryset.filter(
-                Q(name__icontains=search_query) | Q(description__icontains=search_query)
+                Q(name__icontains=search_query)
+                | Q(description__icontains=search_query)
+                | Q(category__name__icontains=search_query)
             ).distinct()
 
         return queryset
@@ -28,4 +30,14 @@ class CatalogView(ListView):
         context["categories"] = Category.objects.all()
         context["selected_categories"] = self.request.GET.getlist("category")
 
+        return context
+
+
+class CourseDetailView(DetailView):
+    model = Course
+    template_name = "courses/detail_course.html"
+    context_object_name = "course"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         return context
