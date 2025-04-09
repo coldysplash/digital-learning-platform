@@ -8,6 +8,7 @@
 
     {% comment %}bootstrap{% endcomment %}
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.css' %}" />
+
     {% comment %}css{% endcomment %}
     <link rel="stylesheet" href="{% static 'css/index.css' %}" />
   </head>
@@ -20,10 +21,10 @@
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
               <ul class="navbar-nav flex-grow-1">
                 <li class="nav-item ms-auto">
-                  <a href="#" class="nav-link text-white">Вход</a>
+                  <a href="{% url 'users:user_login' %}" class="nav-link text-white">Вход</a>
                 </li>
                 <li class="nav-item">
-                  <a href="#" class="nav-link text-white">Регистрация</a>
+                  <a href="{% url 'users:register_student' %}" class="nav-link text-white">Регистрация</a>
                 </li>
               </ul>
             </div>
@@ -58,5 +59,7 @@
         </div>
       </div>
     </div>
+    {% comment %}js for bootstrap{% endcomment %}
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
   </body>
 </html>
