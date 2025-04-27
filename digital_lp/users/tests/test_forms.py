@@ -34,7 +34,7 @@ class UserRegistrationFormTests(TestCase):
         }
         form = UserRegistrationForm(data=form_data)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors["password1"], ["Minimum 8 characters."])
+        self.assertEqual(form.errors["password1"], ["Минимум 8 символов!"])
 
 
 class UserLoginFormTests(TestCase):

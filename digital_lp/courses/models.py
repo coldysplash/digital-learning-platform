@@ -1,5 +1,7 @@
 from django.db import models
 
+from users.models import User
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True, db_index=True)
@@ -21,7 +23,7 @@ class Category(models.Model):
 class Course(models.Model):
     name = models.CharField(max_length=255, unique=True, db_index=True)
     description = models.TextField()
-    """author_id = models.ForeignKey(User, on_delete=models.CASCADE)"""
+    author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     image = models.ImageField(upload_to="course_images/%Y/%m/%d", blank=True)
     verified = models.BooleanField(default=False)
     pub_date = models.DateField(blank=True, null=True)
@@ -30,3 +32,22 @@ class Course(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class CourseProgress(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+
+    added_date = models.DateField(auto_now_add=True)
+    progress_percentages = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        unique_together = ["student", "course"]
+
+
+class FavoritesCourses(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ["student", "course"]

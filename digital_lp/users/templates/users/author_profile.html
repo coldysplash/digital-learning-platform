@@ -1,0 +1,43 @@
+{% extends 'main/index.html' %}
+{% load static %}
+
+{% block content %}
+  <div class="profile-info">
+    <p>First Name: {{ user.first_name }}</p>
+    <p>Last Name: {{ user.last_name }}</p>
+    <p>Email: {{ user.email }}</p>
+  </div>
+  <h3>Мои курсы</h3>
+  {% if courses|length == 0 %}
+    <div class="text-center">
+      <h3 class="mt-5">Вы еще не создали ни один курс</h3>
+      <button type="button" class="btn btn-success btn-lg">Создать курс</button>
+    </div>
+  {% else %}
+    <div class="course-list">
+      <div class="container-md">
+        <div class="row row-cols-3">
+          {% for course in courses %}
+            <div class="col-sm-6">
+              <div class="card">
+                <img src="{{ course.image.url }}" alt="{{ course.name }}" class="img-course img-thumbnail" />
+                <div class="card-body">
+                  <h4 class="card-title">Название: {{ course.name }}</h4>
+                  <h6>Доступен: {{ course.available }}</h6>
+                  <h6>Верификация: {{ course.verified }}</h6>
+                  <h6>Последние изменения: {{ course.pub_date }}</h6>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <form method="post" class="user_logout">
+    <div class="profile-buttons mt-4 d-flex justify-content-between">
+      <a href="{% url 'users:user_logout' %}" class="logout-btn d-flex align-items-center">Log out of your account</a>
+    </div>
+  </form>
+{% endblock %}

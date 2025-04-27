@@ -17,17 +17,49 @@
       <header>
         <nav class="navbar navbar-expand-sm">
           <div class="container border-bottom border-top py-2 my-3">
-            <a href="{% url 'courses:catalog' %}" class="navbar-brand text-white">Learning-Platform</a>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-              <ul class="navbar-nav flex-grow-1">
-                <li class="nav-item ms-auto">
-                  <a href="{% url 'users:user_login' %}" class="nav-link text-white">Вход</a>
-                </li>
-                <li class="nav-item">
-                  <a href="{% url 'users:register_student' %}" class="nav-link text-white">Регистрация</a>
-                </li>
-              </ul>
-            </div>
+            {% if user.is_authenticated %}
+              {% if user.is_author %}
+                <a href="{% url 'users:profile' %}" class="navbar-brand text-white">Learning-Platform</a>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                  <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item ms-auto">
+                      <a href="{% url 'users:profile' %}" class="nav-link text-white">Профиль</a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="{% url 'users:user_logout' %}" class="nav-link text-white">Выход</a>
+                    </li>
+                  </ul>
+                </div>
+              {% else %}
+                <a href="{% url 'courses:catalog' %}" class="navbar-brand text-white">Learning-Platform</a>
+
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                  <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item ms-auto">
+                      <a href="{% url 'users:profile' %}" class="nav-link text-white">Профиль</a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="{% url 'users:favorites' %}" class="nav-link text-white">Избранное</a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="{% url 'users:user_logout' %}" class="nav-link text-white">Выход</a>
+                    </li>
+                  </ul>
+                </div>
+              {% endif %}
+            {% else %}
+              <a href="{% url 'courses:catalog' %}" class="navbar-brand text-white">Learning-Platform</a>
+              <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                  <li class="nav-item ms-auto">
+                    <a href="{% url 'users:user_login' %}" class="nav-link text-white">Вход</a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{% url 'users:register_student' %}" class="nav-link text-white">Регистрация</a>
+                  </li>
+                </ul>
+              </div>
+            {% endif %}
           </div>
         </nav>
       </header>

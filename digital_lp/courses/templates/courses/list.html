@@ -22,7 +22,7 @@
                   <img src="{{ item.image.url }}" alt="{{ item.name }}" class="img-course img-thumbnail" />
                   <div class="card-body">
                     <h5 class="card-title">{{ item.name }}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">Автор:</h6>
+                    <h6 class="card-subtitle mb-2 text-muted">Автор: {{ item.author.first_name }}{{ item.author.last_name }}</h6>
                   </div>
                 </div>
               </div>

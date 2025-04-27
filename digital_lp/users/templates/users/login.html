@@ -10,6 +10,14 @@
           <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp" class="img-fluid" alt="Sample image" />
         </div>
         <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+          <h2 class="mb-3">Вход</h2>
+          {% if messages %}
+            <div class="alert alert-success" role="alert">
+              {% for message in messages %}
+                {{ message }}
+              {% endfor %}
+            </div>
+          {% endif %}
           <form method="post" class="loginform">
             <!-- Email , Password input -->
             <div data-mdb-input-init class="form-outline mb-4">

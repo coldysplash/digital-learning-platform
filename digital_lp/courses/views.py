@@ -1,5 +1,7 @@
 from django.views.generic import ListView, DetailView
-from .models import Course, Category
+from .models import Course, Category, CourseProgress, FavoritesCourses
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, get_object_or_404
 from django.db.models import Q
 
 
@@ -40,4 +42,45 @@ class CourseDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user
+        if user.is_authenticated:
+            is_enrolled = CourseProgress.objects.filter(
+                student=user, course=self.object
+            ).exists()
+            is_favorite = FavoritesCourses.objects.filter(
+                student=user, course=self.object
+            ).exists()
+            context["is_enrolled"] = is_enrolled
+            context["is_favorite"] = is_favorite
+        else:
+            context["is_enrolled"] = False
+            context["is_favorite"] = False
         return context
+
+
+@login_required(login_url="/users/login")
+def enroll_course(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    user = request.user
+
+    if request.method == "POST":
+        if not CourseProgress.objects.filter(student=user, course=course).exists():
+            CourseProgress.objects.create(student=user, course=course)
+        else:
+            redirect("courses:course_detail_view", pk=course_id)
+
+    return redirect("courses:course_detail_view", pk=course_id)
+
+
+@login_required(login_url="/users/login")
+def add_to_favorites(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    user = request.user
+
+    if request.method == "POST":
+        if not FavoritesCourses.objects.filter(student=user, course=course).exists():
+            FavoritesCourses.objects.create(student=user, course=course)
+        else:
+            redirect("courses:course_detail_view", pk=course_id)
+
+    return redirect("courses:course_detail_view", pk=course_id)

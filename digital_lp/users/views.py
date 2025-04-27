@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
-from .forms import UserRegistrationForm, UserLoginForm
+from .forms import UserRegistrationForm, UserLoginForm, UserProfileForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from django.contrib import messages
+
+from courses.models import Course, CourseProgress, FavoritesCourses
 
 
 def register_student(request):
@@ -10,7 +13,7 @@ def register_student(request):
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
+            messages.success(request, "Регистрация прошла успешно!")
             return redirect("users:user_login")
     else:
         form = UserRegistrationForm()
@@ -25,7 +28,7 @@ def register_author(request):
             user = form.save(commit=False)
             user.is_author = True
             user.save()
-            login(request, user)
+            messages.success(request, "Регистрация прошла успешно!")
             return redirect("users:user_login")
     else:
         form = UserRegistrationForm()
@@ -42,10 +45,7 @@ def user_login(request):
             user = authenticate(request, email=email, password=password)
             if user is not None:
                 login(request, user)
-                if user.is_author:
-                    return redirect("users:author_profile")
-                else:
-                    return redirect("users:student_profile")
+                return redirect("users:profile")
             else:
                 form.add_error(None, "Invalid email or password.")
     else:
@@ -60,17 +60,33 @@ def user_logout(request):
     return redirect("users:user_login")
 
 
-@login_required
-def profile_author(request):
-    if not request.user.is_author:
-        return redirect("users:student_profile")
+@login_required(login_url="/users/login")
+def profile(request):
+    user = request.user
+    if user.is_author:
+        form = UserProfileForm(instance=user)
+        author_courses = Course.objects.filter(author=user)
+        return render(
+            request,
+            "users/author_profile.html",
+            {"form": form, "courses": author_courses},
+        )
+    else:
+        form = UserProfileForm(instance=user)
+        student_courses = CourseProgress.objects.filter(student=user)
+        return render(
+            request,
+            "users/student_profile.html",
+            {"form": form, "student_courses": student_courses},
+        )
 
-    return render(request, "users/author_profile.html")
 
-
-@login_required
-def profile_student(request):
-    if request.user.is_author:
-        return redirect("users:author_profile")
-
-    return render(request, "users/student_profile.html")
+@login_required(login_url="/users/login")
+def favorites(request):
+    user = request.user
+    fav_courses = FavoritesCourses.objects.filter(student=user)
+    return render(
+        request,
+        "users/favorites.html",
+        {"favorite_courses": fav_courses},
+    )

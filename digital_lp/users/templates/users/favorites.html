@@ -7,17 +7,17 @@
     <p>Last Name: {{ user.last_name }}</p>
     <p>Email: {{ user.email }}</p>
   </div>
-  <h3>Мои курсы</h3>
-  {% if student_courses|length == 0 %}
+  <h3>Добавлено в избранное</h3>
+  {% if favorite_courses|length == 0 %}
     <div class="text-center">
-      <h3 class="mt-5">Вы еще не записались ни на один курс</h3>
-      <a href="{% url 'courses:catalog' %}">Смотреть каталог</a>
+      <h3 class="mt-5">Нет курсов в избранном</h3>
+      <a href="{% url 'courses:catalog' %}"><button type="button" class="btn btn-success btn-lg">Каталог</button></a>
     </div>
   {% else %}
     <div class="course-list">
       <div class="container-md">
         <div class="row row-cols-3">
-          {% for item in student_courses %}
+          {% for item in favorite_courses %}
             <div class="col-sm-6">
               <div class="card">
                 <img src="{{ item.course.image.url }}" alt="{{ item.course.name }}" class="img-course img-thumbnail" />
@@ -31,10 +31,4 @@
       </div>
     </div>
   {% endif %}
-
-  <form method="post" class="user_logout">
-    <div class="profile-buttons mt-4 d-flex justify-content-between">
-      <a href="{% url 'users:user_logout' %}" class="logout-btn d-flex align-items-center">Log out of your account</a>
-    </div>
-  </form>
 {% endblock %}

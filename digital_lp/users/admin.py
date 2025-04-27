@@ -19,12 +19,7 @@ class UserAdmin(admin.ModelAdmin):
         (None, {"fields": ("email", "password")}),
         (
             "Personal Info",
-            {
-                "fields": (
-                    "first_name",
-                    "last_name",
-                )
-            },
+            {"fields": ("first_name", "last_name", "image")},
         ),
         (
             "Permissions",
