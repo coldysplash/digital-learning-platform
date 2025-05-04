@@ -1,8 +1,9 @@
 from django.views.generic import ListView, DetailView
-from .models import Course, Category, CourseProgress, FavoritesCourses
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404
 from django.db.models import Q
+
+from .models import Course, Category, CourseProgress, FavoritesCourses
 
 
 class CatalogView(ListView):
@@ -11,7 +12,7 @@ class CatalogView(ListView):
     context_object_name = "course_items"
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().filter(available=True)
         type_slugs = self.request.GET.getlist("category")
         search_query = self.request.GET.get("q")
 

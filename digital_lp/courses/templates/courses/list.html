@@ -15,19 +15,17 @@
     <div class="container-md">
       <div class="row row-cols-3">
         {% for item in course_items %}
-          {% if item.available %}
-            <a href="{% url 'courses:course_detail_view' item.id %}">
-              <div class="col-sm-6">
-                <div class="card">
-                  <img src="{{ item.image.url }}" alt="{{ item.name }}" class="img-course img-thumbnail" />
-                  <div class="card-body">
-                    <h5 class="card-title">{{ item.name }}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">Автор: {{ item.author.first_name }}{{ item.author.last_name }}</h6>
-                  </div>
+          <a href="{% url 'courses:course_detail_view' item.id %}">
+            <div class="col-sm-6">
+              <div class="card">
+                <img src="{{ item.image.url }}" alt="{{ item.name }}" class="img-course img-thumbnail" />
+                <div class="card-body">
+                  <h5 class="card-title">{{ item.name }}</h5>
+                  <h6 class="card-subtitle mb-2 text-muted">Автор: {{ item.author.first_name }}{{ item.author.last_name }}</h6>
                 </div>
               </div>
-            </a>
-          {% endif %}
+            </div>
+          </a>
         {% endfor %}
       </div>
     </div>
