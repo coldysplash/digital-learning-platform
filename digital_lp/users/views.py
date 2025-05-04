@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
-from .forms import UserRegistrationForm, UserLoginForm, UserProfileForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
 
-from courses.models import Course, CourseProgress, FavoritesCourses
+from .forms import UserRegistrationForm, UserLoginForm, UserProfileForm
+from courses.models import Course
+from learn.models import CourseProgress, FavoritesCourses
 
 
 def register_student(request):

@@ -3,7 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404
 from django.db.models import Q
 
-from .models import Course, Category, CourseProgress, FavoritesCourses
+from .models import Course, Category
+from learn.models import CourseProgress, FavoritesCourses
 
 
 class CatalogView(ListView):
