@@ -11,7 +11,7 @@
   {% if courses|length == 0 %}
     <div class="text-center">
       <h3 class="mt-5">Вы еще не создали ни один курс</h3>
-      <button type="button" class="btn btn-success btn-lg">Создать курс</button>
+      <a href="{% url 'courses:create' %}"><button type="button" class="btn btn-success btn-lg">Создать курс</button></a>
     </div>
   {% else %}
     <div class="course-list">
@@ -30,6 +30,7 @@
               </div>
             </div>
           {% endfor %}
+          <a href="{% url 'courses:create' %}"><button type="button" class="btn btn-success btn-lg">Создать курс</button></a>
         </div>
       </div>
     </div>

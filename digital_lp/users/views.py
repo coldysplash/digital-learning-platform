@@ -46,8 +46,6 @@ def user_login(request):
             if user is not None:
                 login(request, user)
                 return redirect("users:profile")
-            else:
-                form.add_error(None, "Invalid email or password.")
     else:
         form = UserLoginForm()
 

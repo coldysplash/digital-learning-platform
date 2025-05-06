@@ -1,0 +1,48 @@
+{% extends 'main/index.html' %}
+{% block content %}
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold mb-6">Создание нового курса</h1>
+
+    <form method="POST" enctype="multipart/form-data" class="max-w-lg">
+      {% csrf_token %}
+
+      <!-- Поле Название -->
+      <div class="mb-4">
+        <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700">Название курса</label>
+        {{ form.name }}
+        {% if form.name.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.name.errors }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Поле Описание -->
+      <div class="mb-4">
+        <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700">Описание</label>
+        {{ form.description }}
+        {% if form.description.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.description.errors }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Поле Изображение -->
+      <div class="mb-4">
+        <label for="{{ form.image.id_for_label }}" class="block text-sm font-medium text-gray-700">Изображение курса</label>
+        {{ form.image }}
+        {% if form.image.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.image.errors }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Поле Категория -->
+      <div class="mb-4">
+        <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700">Категория</label>
+        {{ form.category }}
+        {% if form.category.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.category.errors }}</p>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Создать курс</button>
+    </form>
+  </div>
+{% endblock %}

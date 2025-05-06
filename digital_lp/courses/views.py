@@ -1,8 +1,12 @@
 from django.views.generic import ListView, DetailView
 from django.db.models import Q
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from .models import Course, Category
 from learn.models import CourseProgress, FavoritesCourses
+from .forms import CourseCreateForm
 
 
 class CatalogView(ListView):
@@ -56,3 +60,23 @@ class CourseDetailView(DetailView):
             context["is_enrolled"] = False
             context["is_favorite"] = False
         return context
+
+
+@login_required(login_url="/users/login")
+def course_create(request):
+    if request.method == "POST":
+        form = CourseCreateForm(request.POST, request.FILES)
+        if form.is_valid():
+            course = form.save(commit=False)
+            course.author = request.user
+            course.save()
+            return redirect("users:profile")
+
+    else:
+        form = CourseCreateForm()
+
+    return render(
+        request,
+        "courses/create.html",
+        {"form": form, "categories": Category.objects.all()},
+    )
