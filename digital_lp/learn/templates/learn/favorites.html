@@ -2,12 +2,7 @@
 {% load static %}
 
 {% block content %}
-  <div class="profile-info">
-    <p>First Name: {{ user.first_name }}</p>
-    <p>Last Name: {{ user.last_name }}</p>
-    <p>Email: {{ user.email }}</p>
-  </div>
-  <h3>Добавлено в избранное</h3>
+  <h3>Моё избранное</h3>
   {% if favorite_courses|length == 0 %}
     <div class="text-center">
       <h3 class="mt-5">Нет курсов в избранном</h3>

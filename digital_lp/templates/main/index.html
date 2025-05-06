@@ -39,7 +39,10 @@
                       <a href="{% url 'users:profile' %}" class="nav-link text-white">Профиль</a>
                     </li>
                     <li class="nav-item">
-                      <a href="{% url 'users:favorites' %}" class="nav-link text-white">Избранное</a>
+                      <a href="{% url 'learn:favorites' %}" class="nav-link text-white">Избранное</a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="{% url 'learn:student_courses' %}" class="nav-link text-white">Обучение</a>
                     </li>
                     <li class="nav-item">
                       <a href="{% url 'users:user_logout' %}" class="nav-link text-white">Выход</a>
@@ -81,7 +84,7 @@
 
             <ul class="nav col-md-4 justify-content-end">
               <li class="nav-item">
-                <a href="#" class="nav-link px-2 text-white">Главная</a>
+                <a href="{% url 'courses:catalog' %}" class="nav-link px-2 text-white">Главная</a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link px-2 text-white">About</a>

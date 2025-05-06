@@ -6,7 +6,6 @@ from django.contrib import messages
 
 from .forms import UserRegistrationForm, UserLoginForm, UserProfileForm
 from courses.models import Course
-from learn.models import CourseProgress, FavoritesCourses
 
 
 def register_student(request):
@@ -74,20 +73,8 @@ def profile(request):
         )
     else:
         form = UserProfileForm(instance=user)
-        student_courses = CourseProgress.objects.filter(student=user)
         return render(
             request,
             "users/student_profile.html",
-            {"form": form, "student_courses": student_courses},
+            {"form": form},
         )
-
-
-@login_required(login_url="/users/login")
-def favorites(request):
-    user = request.user
-    fav_courses = FavoritesCourses.objects.filter(student=user)
-    return render(
-        request,
-        "users/favorites.html",
-        {"favorite_courses": fav_courses},
-    )

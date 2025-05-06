@@ -1,6 +1,4 @@
 from django.views.generic import ListView, DetailView
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, get_object_or_404
 from django.db.models import Q
 
 from .models import Course, Category
@@ -58,31 +56,3 @@ class CourseDetailView(DetailView):
             context["is_enrolled"] = False
             context["is_favorite"] = False
         return context
-
-
-@login_required(login_url="/users/login")
-def enroll_course(request, course_id):
-    course = get_object_or_404(Course, id=course_id)
-    user = request.user
-
-    if request.method == "POST":
-        if not CourseProgress.objects.filter(student=user, course=course).exists():
-            CourseProgress.objects.create(student=user, course=course)
-        else:
-            redirect("courses:course_detail_view", pk=course_id)
-
-    return redirect("courses:course_detail_view", pk=course_id)
-
-
-@login_required(login_url="/users/login")
-def add_to_favorites(request, course_id):
-    course = get_object_or_404(Course, id=course_id)
-    user = request.user
-
-    if request.method == "POST":
-        if not FavoritesCourses.objects.filter(student=user, course=course).exists():
-            FavoritesCourses.objects.create(student=user, course=course)
-        else:
-            redirect("courses:course_detail_view", pk=course_id)
-
-    return redirect("courses:course_detail_view", pk=course_id)

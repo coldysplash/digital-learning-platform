@@ -1,0 +1,29 @@
+{% extends 'main/index.html' %}
+{% load static %}
+
+{% block content %}
+  <h3>Мои курсы</h3>
+  {% if student_courses|length == 0 %}
+    <div class="text-center">
+      <h3 class="mt-5">Вы еще не записались ни на один курс</h3>
+      <a href="{% url 'courses:catalog' %}">Смотреть каталог</a>
+    </div>
+  {% else %}
+    <div class="course-list">
+      <div class="container-md">
+        <div class="row row-cols-3">
+          {% for item in student_courses %}
+            <div class="col-sm-6">
+              <div class="card">
+                <img src="{{ item.course.image.url }}" alt="{{ item.course.name }}" class="img-course img-thumbnail" />
+                <div class="card-body">
+                  <h4 class="card-title">Название: {{ item.course.name }}</h4>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}

@@ -21,7 +21,7 @@
       <div class="col-sm-4">
         <div class="d-grid gap-2">
           {% if not is_enrolled %}
-            <form method="post" action="{% url 'courses:enroll_course' course.id %}">
+            <form method="post" action="{% url 'learn:enroll_course' course.id %}">
               {% csrf_token %}
               <button type="submit" class="btn btn-success btn-lg">Записаться на курс</button>
             </form>
@@ -30,7 +30,7 @@
           {% endif %}
 
           {% if not is_favorite %}
-            <form method="post" action="{% url 'courses:add_to_favorites' course.id %}">
+            <form method="post" action="{% url 'learn:add_to_favorites' course.id %}">
               {% csrf_token %}
               <button type="submit" class="btn btn-outline-primary btn-lg">Добавить в избранное</button>
             </form>
