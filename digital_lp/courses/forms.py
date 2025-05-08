@@ -5,8 +5,7 @@ import os
 from .models import Course
 
 
-# Форма для создания курса
-class CourseCreateForm(forms.ModelForm):
+class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = ["name", "description", "image", "category"]
