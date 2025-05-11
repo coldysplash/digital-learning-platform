@@ -10,9 +10,13 @@ from users.models import User
 
 # Модель для отдельного модуля курса с уроками
 class Module(models.Model):
-    name = models.CharField(max_length=255, unique=True, db_index=True)
+    name = models.CharField(max_length=100, unique=True, db_index=True)
     description = models.TextField()
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    order = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order"]
 
     def __str__(self):
         return self.name
@@ -20,7 +24,7 @@ class Module(models.Model):
 
 # Модель для уроков
 class Lesson(models.Model):
-    title = models.CharField(max_length=255, db_index=True)
+    title = models.CharField(max_length=100, db_index=True)
     description = models.TextField()
     module = models.ForeignKey(Module, on_delete=models.CASCADE)
     order = models.PositiveSmallIntegerField(default=0)
@@ -69,10 +73,13 @@ class ImageContent(models.Model):
 
 # Модели для реализации тестов
 class Test(models.Model):
-    title = models.CharField(max_length=255, unique=True, db_index=True)
+    title = models.CharField(max_length=100, unique=True, db_index=True)
     description = models.TextField()
     passing_score = models.PositiveSmallIntegerField(blank=True, null=True)
     module = models.ForeignKey(Module, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
 
 
 class Questions(models.Model):
@@ -84,11 +91,17 @@ class Questions(models.Model):
         unique_together = ["test", "order"]
         ordering = ["order"]
 
+    def __str__(self):
+        return self.question
+
 
 class Answers(models.Model):
-    answer = models.CharField(max_length=255)
+    answer = models.CharField(max_length=100)
     flag = models.BooleanField(default=False)
     question = models.ForeignKey(Questions, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.answer
 
 
 class TestResults(models.Model):
@@ -111,6 +124,9 @@ class Task(models.Model):
     def clean(self):
         if self.deadline and self.deadline < timezone.now():
             raise ValidationError("Deadline cannot be in the past.")
+
+    def __str__(self):
+        return self.title
 
 
 class TaskFeedback(models.Model):
