@@ -26,6 +26,7 @@
                   <h6>Доступен: {{ course.available }}</h6>
                   <h6>Верификация: {{ course.verified }}</h6>
                   <h6>Последние изменения: {{ course.pub_date }}</h6>
+                  <a href="{% url 'construct:main' course.id %}"><button type="button" class="btn btn-success btn-lg">Редактировать</button></a>
                 </div>
               </div>
             </div>
