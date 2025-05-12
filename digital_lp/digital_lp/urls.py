@@ -9,6 +9,7 @@ urlpatterns = [
     path("", include("courses.urls", namespace="courses")),
     path("users/", include("users.urls", namespace="users")),
     path("learn/", include("learn.urls", namespace="learn")),
+    path("construct/", include("course_construct.urls", namespace="construct")),
     path("admin/", admin.site.urls),
 ]
 

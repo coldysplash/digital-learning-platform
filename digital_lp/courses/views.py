@@ -2,11 +2,11 @@ from django.views.generic import ListView, DetailView
 from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
 
 from .models import Course, Category
-from learn.models import CourseProgress, FavoritesCourses
 from .forms import CourseForm
+from learn.models import CourseProgress, FavoritesCourses
+from users.views import author_required
 
 
 class CatalogView(ListView):
@@ -62,19 +62,17 @@ class CourseDetailView(DetailView):
         return context
 
 
-@login_required(login_url="/users/login")
+@login_required
+@author_required
 def course_create(request):
     user = request.user
-    if not user.is_author:
-        raise Http404("You can't create a course, because you're not the author.")
-
     if request.method == "POST":
         form = CourseForm(request.POST, request.FILES)
         if form.is_valid():
             course = form.save(commit=False)
             course.author = user
             course.save()
-            return redirect("users:profile")
+            return redirect("construct:main", course_id=course.id)
     else:
         form = CourseForm()
 

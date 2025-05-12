@@ -1,0 +1,13 @@
+{% extends 'constructor/index.html' %}
+
+{% block content %}
+  <div class="container mt-5">
+    <h2>Удаление модуля</h2>
+    <p>Вы уверены, что хотите удалить модуль "{{ module.name }}" из курса "{{ course.name }}"?</p>
+    <form method="post" action="{% url 'construct:module_delete' module_id=module.id %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Удалить</button>
+      <a href="{% url 'construct:module' module.id %}" class="btn btn-secondary mt-3">Отмена</a>
+    </form>
+  </div>
+{% endblock %}

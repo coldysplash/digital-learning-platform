@@ -1,0 +1,11 @@
+{% load crispy_forms_tags %}
+
+<div class="container mt-5" id="modal" style="display: block;">
+  <form method="post" action="{% url 'construct:module_edit' module.id %}">
+    {% csrf_token %}
+    {{ form.name|as_crispy_field }}
+    {{ form.description|as_crispy_field }}
+    <button type="submit" class="btn btn-primary mt-3">Сохранить изменения</button>
+    <a href="{% url 'construct:main' course.id %}" class="btn btn-secondary mt-3">Отмена</a>
+  </form>
+</div>

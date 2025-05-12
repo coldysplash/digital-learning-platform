@@ -1,0 +1,10 @@
+{% load crispy_forms_tags %}
+
+<div class="container mt-5" id="modal" style="display: block;">
+  {% csrf_token %}
+  {{ module.order }}
+  {{ module.name }}
+  {{ module.description }}
+  <button hx-get="{% url 'construct:module_edit' module.id %}" hx-target="#modal" hx-swap="outerHTML" class="btn btn-secondary mt-3">Редактировать</button>
+  <a href="{% url 'construct:module_delete' module_id=module.id %}" class="btn btn-secondary mt-3">Удалить</a>
+</div>

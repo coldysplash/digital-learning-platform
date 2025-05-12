@@ -10,7 +10,7 @@ from users.models import User
 
 # Модель для отдельного модуля курса с уроками
 class Module(models.Model):
-    name = models.CharField(max_length=100, unique=True, db_index=True)
+    name = models.CharField(max_length=100, db_index=True)
     description = models.TextField()
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     order = models.PositiveSmallIntegerField(default=0)
