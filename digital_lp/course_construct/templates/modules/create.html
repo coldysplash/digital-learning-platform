@@ -6,6 +6,6 @@
     {{ form.name|as_crispy_field }}
     {{ form.description|as_crispy_field }}
     <button type="submit" class="btn btn-primary mt-3">Сохранить изменения</button>
-    <a href="{% url 'construct:main' course.id %}" class="btn btn-secondary mt-3">Отмена</a>
+    <a hx-get="{% url 'construct:main' course.id %}" hx-target="#modal" hx-swap="outerHTML" class="btn btn-secondary mt-3">Отмена</a>
   </form>
 </div>

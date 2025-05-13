@@ -13,52 +13,43 @@ from django.views.generic import (
     DeleteView,
 )
 
-from .models import Module, Course
-from .forms import ModuleForm
+from .models import *
+from .forms import *
 from users.views import author_required
 
 
-class AuthorRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        course = self.get_course()
-        return course.author == self.request.user
-
-    def handle_no_permission(self):
-        return HttpResponseForbidden("You are not authorized to perform this action.")
-
-    def get_course(self):
-        if hasattr(self, "object") and self.object:
-            return self.object.course
-        if "pk" in self.kwargs:
-            module = get_object_or_404(Module, id=self.kwargs["pk"])
-            return module.course
-        if "course_id" in self.kwargs:
-            return get_object_or_404(Course, id=self.kwargs["course_id"])
-        raise Http404("Course not found")
-
-
-class ModuleListView(LoginRequiredMixin, AuthorRequiredMixin, ListView):
+class ConstructorCourseView(LoginRequiredMixin, ListView):
     model = Module
     template_name = "construct/main.html"
     context_object_name = "module_list"
 
     def get_queryset(self):
-        course = get_object_or_404(Course, id=self.kwargs["course_id"])
+        course = get_object_or_404(Course, id=self.kwargs["pk"])
         return Module.objects.filter(course=course)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["course"] = get_object_or_404(Course, id=self.kwargs["course_id"])
+        course = get_object_or_404(Course, id=self.kwargs["pk"])
+        context["course"] = course
+        # Добавляем список всех уроков курса, отсортированных по модулю и порядку
+        context["lessons"] = Lesson.objects.filter(module__course=course).order_by(
+            "module__order", "order"
+        )
         return context
 
 
-class ModuleDetailView(LoginRequiredMixin, AuthorRequiredMixin, DetailView):
+class ModuleDetailView(LoginRequiredMixin, DetailView):
     model = Module
     template_name = "modules/module.html"
     context_object_name = "module"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["lessons"] = self.object.lesson_set.all()
+        return context
 
-class ModuleCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView):
+
+class ModuleCreateView(LoginRequiredMixin, CreateView):
     model = Module
     form_class = ModuleForm
     template_name = "modules/create.html"
@@ -82,20 +73,13 @@ class ModuleCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView):
         return context
 
 
-class ModuleUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
+class ModuleUpdateView(LoginRequiredMixin, UpdateView):
     model = Module
     form_class = ModuleForm
     template_name = "modules/form.html"
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        messages.success(self.request, "Модуль сохранен!")
-        return response
-
     def get_success_url(self):
-        return reverse_lazy(
-            "construct:main", kwargs={"course_id": self.object.course.id}
-        )
+        return reverse_lazy("construct:main", kwargs={"pk": self.object.course.id})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -106,8 +90,8 @@ class ModuleUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
 
 @login_required
 @author_required
-def module_delete(request, module_id):
-    module = get_object_or_404(Module, id=module_id)
+def module_delete(request, pk):
+    module = get_object_or_404(Module, id=pk)
     course = module.course
     if request.method == "POST":
         module.delete()
@@ -116,10 +100,70 @@ def module_delete(request, module_id):
             mod.order = i
             mod.save()
         messages.success(request, "Модуль удален!")
-        return redirect("construct:main", course_id=course.id)
+        return redirect("construct:main", pk=course.id)
 
     return render(
         request,
         "modules/delete.html",
         {"module": module, "course": course},
+    )
+
+
+# Lesson CRUD
+class LessonCreateView(LoginRequiredMixin, CreateView):
+    model = Lesson
+    form_class = LessonForm
+    template_name = "lessons/create.html"
+
+    def form_valid(self, form):
+        module = get_object_or_404(Module, id=self.kwargs["module_id"])
+        count_lesson = Lesson.objects.filter(module=module).count()
+        form.instance.order = count_lesson + 1
+        form.instance.module = module
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy("construct:module", kwargs={"pk": self.kwargs["module_id"]})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["module"] = get_object_or_404(Module, id=self.kwargs["module_id"])
+        return context
+
+
+class LessonDetailView(LoginRequiredMixin, DetailView):
+    model = Lesson
+    template_name = "lessons/lesson.html"
+    context_object_name = "lesson"
+
+
+class LessonUpdateView(LoginRequiredMixin, UpdateView):
+    model = Lesson
+    form_class = LessonForm
+    template_name = "lessons/form.html"
+
+    def get_success_url(self):
+        return reverse_lazy("construct:lesson", kwargs={"pk": self.object.pk})
+
+
+@login_required
+@author_required
+def lesson_delete(request, pk):
+    lesson = get_object_or_404(Lesson, id=pk)
+    module = lesson.module
+    course = module.course
+    if request.method == "POST":
+        lesson.delete()
+        # Обновляем order для оставшихся уроков
+        for i, les in enumerate(lesson.module.lesson_set.all(), start=1):
+            if les.order != i:
+                les.order = i
+                les.save()
+        messages.success(request, "Урок удален!")
+        return redirect("construct:main", pk=course.id)
+
+    return render(
+        request,
+        "lessons/delete.html",
+        {"lesson": lesson, "module": module},
     )

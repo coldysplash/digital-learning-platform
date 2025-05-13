@@ -6,6 +6,12 @@
     <div class="col-2 border">
       {% for module in module_list %}
         <button hx-get="{% url 'construct:module' module.id %}" hx-target="#modal" hx-swap="outerHTML">{{ module.order }}. {{ module.name }}</button><br />
+
+        {% for lesson in lessons %}
+          {% if lesson.module.id == module.id %}
+            <button hx-get="{% url 'construct:lesson' lesson.id %}" hx-target="#modal" hx-swap="outerHTML">{{ lesson.order }}. {{ lesson.title }}</button><br />
+          {% endif %}
+        {% endfor %}
       {% endfor %}
       <button hx-get="{% url 'construct:module_create' course_id=course.id %}" hx-target="#modal" hx-swap="outerHTML"><div class="">Добавить модуль</div></button>
     </div>

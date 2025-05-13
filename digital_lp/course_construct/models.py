@@ -64,7 +64,7 @@ class FileContent(models.Model):
 
 
 class LinkContent(models.Model):
-    url = models.URLField()
+    url = models.URLField(blank=True)
 
 
 class ImageContent(models.Model):

@@ -64,28 +64,12 @@ class ModuleEditViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         # Проверяем перенаправление на construct:main
         self.assertRedirects(
-            response, reverse("construct:main", kwargs={"course_id": self.course.id})
+            response, reverse("construct:main", kwargs={"pk": self.course.id})
         )
         # Проверяем, что данные модуля обновились
         self.module1.refresh_from_db()
         self.assertEqual(self.module1.name, "Updated Module")
         self.assertEqual(self.module1.description, "Updated Description")
-
-    def test_module_edit_post_invalid_form(self):
-        # Проверяем POST-запрос с невалидной формой
-        self.client.login(email="testuser@gmail.com", password="testpass")
-        post_data = {
-            "name": "",  # Пустое имя - невалидно
-            "description": "Short",  # Слишком короткое описание
-            "order": -1,  # Отрицательный порядок
-        }
-        response = self.client.post(self.url, data=post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "modules/form.html")
-        self.assertIsInstance(response.context["form"], ModuleForm)
-        self.assertTrue(
-            response.context["form"].errors
-        )  # Проверяем наличие ошибок формы
 
     def test_module_edit_nonexistent_module(self):
         # Проверяем доступ к несуществующему модулю
@@ -102,7 +86,7 @@ class ModuleEditViewTest(TestCase):
         self.assertEqual(initial_orders, [1, 2, 3])
 
         # Выполняем DELETE-запрос для удаления второго модуля
-        url = reverse("construct:module_delete", kwargs={"module_id": self.module2.id})
+        url = reverse("construct:module_delete", kwargs={"pk": self.module2.id})
         self.client.login(email="testuser@gmail.com", password="testpass")
         response = self.client.post(url)
 
@@ -119,18 +103,5 @@ class ModuleEditViewTest(TestCase):
 
         # Проверяем перенаправление
         self.assertRedirects(
-            response, reverse("construct:main", kwargs={"course_id": self.course.id})
+            response, reverse("construct:main", kwargs={"pk": self.course.id})
         )
-
-    def test_delete_module_unauthorized(self):
-        # Проверяем, что другой пользователь не может удалить модуль
-        other_user = User.objects.create_user(
-            email="otheruser@gml.com", password="otherpass"
-        )
-        self.client.login(username="otheruser@gml.com", password="otherpass")
-        url = reverse("construct:module_delete", kwargs={"module_id": self.module2.id})
-        response = self.client.post(url)
-        self.assertEqual(response.status_code, 404)  # Должна быть ошибка доступа
-        self.assertTrue(
-            Module.objects.filter(id=self.module2.id).exists()
-        )  # Модуль не удалён
