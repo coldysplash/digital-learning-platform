@@ -1,5 +1,3 @@
-{% load crispy_forms_tags %}
-
 <div class="container mt-5" id="modal" style="display: block;">
   {% csrf_token %}
   {{ lesson.order }}
@@ -7,4 +5,21 @@
   {{ lesson.description }}
   <button hx-get="{% url 'construct:lesson_edit' lesson.id %}" hx-target="#modal" hx-swap="outerHTML" class="btn btn-secondary mt-3">Редактировать</button>
   <a hx-get="{% url 'construct:lesson_delete' lesson.id %}" hx-target="#modal" hx-swap="outerHTML" class="btn btn-secondary mt-3">Удалить</a>
+  <br />
+  <h3>Content</h3>
+  <ul>
+    {% for content in contents %}
+      <li>{{ content.content_type.model }}</li>
+      <a href="{% url 'construct:content_edit' lesson_id=lesson.id pk=content.id %}" class="btn btn-secondary">Редактировать контент</a>
+      <a href="{% url 'construct:content_delete' lesson_id=lesson.id pk=content.id %}" class="btn btn-secondary">Удалить контент</a>
+    {% endfor %}
+  </ul>
+
+  <h3>Добавить новый контент</h3>
+  <div class="button-group">
+    <a href="{% url 'construct:add_text' lesson_id=lesson.id %}" class="btn btn-primary">Добавить текст</a>
+    <a href="{% url 'construct:add_file' lesson_id=lesson.id %}" class="btn btn-primary">Добавить файл</a>
+    <a href="{% url 'construct:add_link' lesson_id=lesson.id %}" class="btn btn-primary">Добавить ссылку</a>
+    <a href="{% url 'construct:add_image' lesson_id=lesson.id %}" class="btn btn-primary">Добавить изображение</a>
+  </div>
 </div>

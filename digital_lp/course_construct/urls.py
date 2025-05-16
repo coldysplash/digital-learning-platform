@@ -31,3 +31,36 @@ urlpatterns = [
         name="lesson_delete",
     ),
 ]
+
+urlpatterns += [
+    path(
+        "lesson/<int:lesson_id>/content/text/create/",
+        views.TextContentCreateView.as_view(),
+        name="add_text",
+    ),
+    path(
+        "lesson/<int:lesson_id>/content/file/create/",
+        views.FileContentCreateView.as_view(),
+        name="add_file",
+    ),
+    path(
+        "lesson/<int:lesson_id>/content/link/create/",
+        views.LinkContentCreateView.as_view(),
+        name="add_link",
+    ),
+    path(
+        "lesson/<int:lesson_id>/content/image/create/",
+        views.ImageContentCreateView.as_view(),
+        name="add_image",
+    ),
+    path(
+        "lesson/<int:lesson_id>/content/<int:pk>/",
+        views.ContentUpdateView.as_view(),
+        name="content_edit",
+    ),
+    path(
+        "lesson/<int:lesson_id>/content/<int:pk>/delete/",
+        views.ContentDeleteView.as_view(),
+        name="content_delete",
+    ),
+]

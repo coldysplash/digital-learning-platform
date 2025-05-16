@@ -1,9 +1,9 @@
 from django.test import TestCase, Client
 from django.urls import reverse
-from django.contrib.messages import get_messages
 from courses.models import Course, Category
-from ..models import Module, Lesson
 from users.models import User
+
+from ..models import Module, Lesson
 
 
 class LessonViewsTests(TestCase):

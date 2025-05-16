@@ -62,6 +62,10 @@ class TextContent(models.Model):
 class FileContent(models.Model):
     file = models.FileField(upload_to="lesson_files/%Y/%m/%d", blank=True)
 
+    def delete(self):
+        self.file.delete()
+        super.delete()
+
 
 class LinkContent(models.Model):
     url = models.URLField(blank=True)
@@ -69,6 +73,10 @@ class LinkContent(models.Model):
 
 class ImageContent(models.Model):
     image = models.ImageField(upload_to="lesson_images/%Y/%m/%d", blank=True)
+
+    def delete(self):
+        self.image.delete()
+        super.delete()
 
 
 # Модели для реализации тестов

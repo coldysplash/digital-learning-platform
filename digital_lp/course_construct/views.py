@@ -2,8 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.http import Http404, HttpResponseForbidden
 from django.urls import reverse_lazy
+from django.db import transaction
+
 
 from django.views.generic import (
     ListView,
@@ -38,6 +39,7 @@ class ConstructorCourseView(LoginRequiredMixin, ListView):
         return context
 
 
+# Module CRUD
 class ModuleDetailView(LoginRequiredMixin, DetailView):
     model = Module
     template_name = "modules/module.html"
@@ -63,9 +65,7 @@ class ModuleCreateView(LoginRequiredMixin, CreateView):
         return response
 
     def get_success_url(self):
-        return reverse_lazy(
-            "construct:main", kwargs={"course_id": self.kwargs["course_id"]}
-        )
+        return reverse_lazy("construct:main", kwargs={"pk": self.kwargs["course_id"]})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -136,6 +136,12 @@ class LessonDetailView(LoginRequiredMixin, DetailView):
     template_name = "lessons/lesson.html"
     context_object_name = "lesson"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Добавляем контент урока в контекст
+        context["contents"] = self.object.contents.all()
+        return context
+
 
 class LessonUpdateView(LoginRequiredMixin, UpdateView):
     model = Lesson
@@ -167,3 +173,91 @@ def lesson_delete(request, pk):
         "lessons/delete.html",
         {"lesson": lesson, "module": module},
     )
+
+
+# Базовое представление для создания контента
+class BaseContentCreateView(LoginRequiredMixin, CreateView):
+    template_name = "lessons/content/create_form.html"
+
+    def form_valid(self, form):
+        content_object = form.save()
+        lesson = Lesson.objects.get(id=self.kwargs["lesson_id"])
+        content_type_obj = ContentType.objects.get_for_model(content_object)
+        order = LessonContent.objects.filter(lesson=lesson).count() + 1
+        LessonContent.objects.create(
+            lesson=lesson,
+            content_type=content_type_obj,
+            object_id=content_object.id,
+            order=order,
+        )
+        return redirect(reverse_lazy("construct:lesson", kwargs={"pk": lesson.id}))
+
+
+# Представления для создания каждого типа контента
+class TextContentCreateView(BaseContentCreateView):
+    model = TextContent
+    form_class = TextContentForm
+
+
+class FileContentCreateView(BaseContentCreateView):
+    model = FileContent
+    form_class = FileContentForm
+
+
+class LinkContentCreateView(BaseContentCreateView):
+    model = LinkContent
+    form_class = LinkContentForm
+
+
+class ImageContentCreateView(BaseContentCreateView):
+    model = ImageContent
+    form_class = ImageContentForm
+
+
+# Представление для редактирования контента
+class ContentUpdateView(LoginRequiredMixin, UpdateView):
+    template_name = "lessons/content/edit_form.html"
+
+    def get_object(self):
+        lesson_content = LessonContent.objects.get(id=self.kwargs["pk"])
+        return lesson_content.content_object
+
+    def get_form_class(self):
+        lesson_content = LessonContent.objects.get(id=self.kwargs["pk"])
+        content_type = lesson_content.content_type.model
+        form_classes = {
+            "textcontent": TextContentForm,
+            "filecontent": FileContentForm,
+            "linkcontent": LinkContentForm,
+            "imagecontent": ImageContentForm,
+        }
+        return form_classes[content_type]
+
+    def form_valid(self, form):
+        form.save()
+        return redirect(
+            reverse_lazy("construct:lesson", kwargs={"pk": self.kwargs["lesson_id"]})
+        )
+
+
+# Представление для удаления контента
+class ContentDeleteView(LoginRequiredMixin, DeleteView):
+    model = LessonContent
+    template_name = "lessons/content/confirm_delete.html"
+
+    def post(self, request, *args, **kwargs):
+        lesson_content = self.get_object()
+        content_object = lesson_content.content_object
+        with transaction.atomic():
+            lesson_content.delete()
+            content_object.delete()
+            remaining_contents = LessonContent.objects.filter(
+                lesson=self.kwargs["lesson_id"]
+            ).order_by("order")
+            for index, content in enumerate(remaining_contents, start=1):
+                content.order = index
+                content.save()
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse_lazy("construct:lesson", kwargs={"pk": self.kwargs["lesson_id"]})
