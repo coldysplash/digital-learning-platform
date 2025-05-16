@@ -32,3 +32,7 @@ class Course(models.Model):
 
     def __str__(self):
         return self.name
+
+    def delete(self):
+        self.image.delete()
+        super().delete()

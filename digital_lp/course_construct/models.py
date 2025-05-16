@@ -64,7 +64,7 @@ class FileContent(models.Model):
 
     def delete(self):
         self.file.delete()
-        super.delete()
+        super().delete()
 
 
 class LinkContent(models.Model):
@@ -76,7 +76,7 @@ class ImageContent(models.Model):
 
     def delete(self):
         self.image.delete()
-        super.delete()
+        super().delete()
 
 
 # Модели для реализации тестов
