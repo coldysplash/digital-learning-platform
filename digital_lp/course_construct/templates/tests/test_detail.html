@@ -1,0 +1,10 @@
+<div class="container mt-5" id="modal" style="display: block;">
+  {% csrf_token %}
+  {{ test.order }}
+  {{ test.title }}
+  {{ test.description }}
+  {{ test.passing_score }}
+  <button hx-get="{% url 'construct:test_edit' test.id %}" hx-target="#modal" hx-swap="outerHTML" class="btn btn-secondary mt-3">Редактировать</button>
+  <a hx-get="{% url 'construct:test_delete' test.id %}" hx-target="#modal" hx-swap="outerHTML" class="btn btn-secondary mt-3">Удалить</a>
+  <br />
+</div>

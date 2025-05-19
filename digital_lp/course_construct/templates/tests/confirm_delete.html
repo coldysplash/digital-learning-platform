@@ -1,0 +1,9 @@
+<div class="container mt-5" id="modal" style="display: block;">
+  <h2>Удаление теста</h2>
+  <p>Вы уверены, что хотите удалить тест "{{ test.title }}" из модуля "{{ module.name }}"?</p>
+  <form method="post" action="{% url 'construct:test_delete' test.id %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Удалить</button>
+    <a hx-get="{% url 'construct:test_detail' test.id %}" hx-target="#modal" hx-swap="outerHTML" class="btn btn-secondary mt-3">Отмена</a>
+  </form>
+</div>

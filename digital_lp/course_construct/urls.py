@@ -32,6 +32,7 @@ urlpatterns = [
     ),
 ]
 
+# lesson content
 urlpatterns += [
     path(
         "lesson/<int:lesson_id>/content/text/create/",
@@ -62,5 +63,21 @@ urlpatterns += [
         "lesson/<int:lesson_id>/content/<int:pk>/delete/",
         views.ContentDeleteView.as_view(),
         name="content_delete",
+    ),
+]
+
+# test crud
+urlpatterns += [
+    path(
+        "module/<int:module_id>/test/create/",
+        views.TestCreateView.as_view(),
+        name="test_create",
+    ),
+    path("test/<int:pk>/", views.TestDetailView.as_view(), name="test_detail"),
+    path("test/<int:pk>/edit/", views.TestUpdateView.as_view(), name="test_edit"),
+    path(
+        "test/<int:pk>/delete/",
+        views.test_delete,
+        name="test_delete",
     ),
 ]

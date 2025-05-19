@@ -4,8 +4,6 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.db import transaction
-
-
 from django.views.generic import (
     ListView,
     DetailView,
@@ -14,6 +12,7 @@ from django.views.generic import (
     DeleteView,
 )
 
+from .utils import delete_item_and_refresh_order
 from .models import *
 from .forms import *
 from users.views import author_required
@@ -32,10 +31,13 @@ class ConstructorCourseView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         course = get_object_or_404(Course, id=self.kwargs["pk"])
         context["course"] = course
-        # Добавляем список всех уроков курса, отсортированных по модулю и порядку
         context["lessons"] = Lesson.objects.filter(module__course=course).order_by(
             "module__order", "order"
         )
+        context["tests"] = Test.objects.filter(module__course=course).order_by(
+            "module__order", "order"
+        )
+
         return context
 
 
@@ -96,9 +98,10 @@ def module_delete(request, pk):
     if request.method == "POST":
         module.delete()
         # Обновляем order для оставшихся модулей
-        for i, mod in enumerate(course.module_set.all(), start=1):
-            mod.order = i
-            mod.save()
+        for index, mod in enumerate(course.module_set.all(), start=1):
+            if mod.order != index:
+                mod.order = index
+                mod.save()
         messages.success(request, "Модуль удален!")
         return redirect("construct:main", pk=course.id)
 
@@ -159,12 +162,7 @@ def lesson_delete(request, pk):
     module = lesson.module
     course = module.course
     if request.method == "POST":
-        lesson.delete()
-        # Обновляем order для оставшихся уроков
-        for i, les in enumerate(lesson.module.lesson_set.all(), start=1):
-            if les.order != i:
-                les.order = i
-                les.save()
+        delete_item_and_refresh_order(module, lesson)
         messages.success(request, "Урок удален!")
         return redirect("construct:main", pk=course.id)
 
@@ -255,9 +253,68 @@ class ContentDeleteView(LoginRequiredMixin, DeleteView):
                 lesson=self.kwargs["lesson_id"]
             ).order_by("order")
             for index, content in enumerate(remaining_contents, start=1):
-                content.order = index
-                content.save()
+                if content.order != index:
+                    content.order = index
+                    content.save()
         return redirect(self.get_success_url())
 
     def get_success_url(self):
         return reverse_lazy("construct:lesson", kwargs={"pk": self.kwargs["lesson_id"]})
+
+
+# Tests CRUD
+class TestCreateView(LoginRequiredMixin, CreateView):
+    model = Test
+    form_class = TestForm
+    template_name = "tests/create.html"
+
+    def form_valid(self, form):
+        module = get_object_or_404(Module, id=self.kwargs["module_id"])
+        count_test = Test.objects.filter(module=module).count()
+        form.instance.order = count_test + 1
+        form.instance.module = module
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy("construct:module", kwargs={"pk": self.kwargs["module_id"]})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["module"] = get_object_or_404(Module, id=self.kwargs["module_id"])
+        return context
+
+
+class TestDetailView(LoginRequiredMixin, DetailView):
+    model = Test
+    template_name = "tests/test_detail.html"
+    context_object_name = "test"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+class TestUpdateView(LoginRequiredMixin, UpdateView):
+    model = Test
+    form_class = TestForm
+    template_name = "tests/form.html"
+
+    def get_success_url(self):
+        return reverse_lazy("construct:test_detail", kwargs={"pk": self.object.pk})
+
+
+@login_required
+@author_required
+def test_delete(request, pk):
+    test = get_object_or_404(Test, id=pk)
+    module = test.module
+    course = module.course
+    if request.method == "POST":
+        delete_item_and_refresh_order(module, test)
+        return redirect("construct:main", pk=course.id)
+
+    return render(
+        request,
+        "tests/confirm_delete.html",
+        {"test": test, "module": module},
+    )

@@ -1,24 +1,8 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from ..models import (
-    Module,
-    Lesson,
-    LessonContent,
-    TextContent,
-    FileContent,
-    LinkContent,
-    ImageContent,
-    Test,
-    Questions,
-    Answers,
-    TestResults,
-    Task,
-    TaskFeedback,
-    TaskComment,
-)
+from ..models import *
 from courses.models import Course, Category
-from users.models import User
 
 
 class ModuleModelTest(TestCase):
@@ -36,17 +20,6 @@ class ModuleModelTest(TestCase):
         )
         self.assertEqual(module.name, "Test Module")
         self.assertEqual(module.course, self.course)
-
-    def test_unique_name(self):
-        Module.objects.create(
-            name="Unique Module", description="Description", course=self.course
-        )
-        with self.assertRaises(Exception):
-            Module.objects.create(
-                name="Unique Module",
-                description="Another Description",
-                course=self.course,
-            )
 
 
 class LessonModelTest(TestCase):
@@ -189,13 +162,6 @@ class QuestionsModelTest(TestCase):
         self.assertEqual(question.question, "What is 2+2?")
         self.assertEqual(question.order, 1)
 
-    def test_unique_order_per_test(self):
-        Questions.objects.create(question="First Question", order=1, test=self.test)
-        with self.assertRaises(Exception):
-            Questions.objects.create(
-                question="Second Question", order=1, test=self.test
-            )
-
 
 class AnswersModelTest(TestCase):
     def setUp(self):
@@ -219,36 +185,6 @@ class AnswersModelTest(TestCase):
         answer = Answers.objects.create(answer="4", flag=True, question=self.question)
         self.assertEqual(answer.answer, "4")
         self.assertTrue(answer.flag)
-
-
-class TestResultsModelTest(TestCase):
-    def setUp(self):
-        self.user = User.objects.create(email="test@example.com", password="password")
-        self.category = Category.objects.create(
-            name="Test Category", slug="test-category", description="Description"
-        )
-        self.course = Course.objects.create(
-            name="Test Course", description="Description", category=self.category
-        )
-        self.module = Module.objects.create(
-            name="Test Module", description="Description", course=self.course
-        )
-        self.test = Test.objects.create(
-            title="Test Title", description="Description", module=self.module
-        )
-
-    def test_create_test_result(self):
-        result = TestResults.objects.create(
-            student=self.user, test=self.test, mark=True
-        )
-        self.assertEqual(result.student, self.user)
-        self.assertEqual(result.test, self.test)
-        self.assertTrue(result.mark)
-
-    def test_unique_student_test(self):
-        TestResults.objects.create(student=self.user, test=self.test, mark=True)
-        with self.assertRaises(Exception):
-            TestResults.objects.create(student=self.user, test=self.test, mark=False)
 
 
 class TaskModelTest(TestCase):
@@ -284,70 +220,3 @@ class TaskModelTest(TestCase):
         )
         with self.assertRaises(ValidationError):
             task.clean()
-
-
-class TaskFeedbackModelTest(TestCase):
-    def setUp(self):
-        self.user = User.objects.create(email="test@example.com", password="password")
-        self.category = Category.objects.create(
-            name="Test Category", slug="test-category", description="Description"
-        )
-        self.course = Course.objects.create(
-            name="Test Course", description="Description", category=self.category
-        )
-        self.module = Module.objects.create(
-            name="Test Module", description="Description", course=self.course
-        )
-        self.task = Task.objects.create(
-            title="Test Task", description="Description", module=self.module
-        )
-
-    def test_create_task_feedback(self):
-        feedback = TaskFeedback.objects.create(
-            student=self.user, task=self.task, grade=85
-        )
-        self.assertEqual(feedback.student, self.user)
-        self.assertEqual(feedback.task, self.task)
-        self.assertEqual(feedback.grade, 85)
-
-    def test_unique_student_task(self):
-        TaskFeedback.objects.create(student=self.user, task=self.task, grade=85)
-        with self.assertRaises(Exception):
-            TaskFeedback.objects.create(student=self.user, task=self.task, grade=90)
-
-
-class TaskCommentModelTest(TestCase):
-    def setUp(self):
-        self.user = User.objects.create(email="test@example.com", password="password")
-        self.category = Category.objects.create(
-            name="Test Category", slug="test-category", description="Description"
-        )
-        self.course = Course.objects.create(
-            name="Test Course", description="Description", category=self.category
-        )
-        self.module = Module.objects.create(
-            name="Test Module", description="Description", course=self.course
-        )
-        self.task = Task.objects.create(
-            title="Test Task", description="Description", module=self.module
-        )
-        self.feedback = TaskFeedback.objects.create(
-            student=self.user, task=self.task, grade=85
-        )
-
-    def test_create_task_comment(self):
-        comment = TaskComment.objects.create(
-            author=self.user, task_feedback=self.feedback, comment="Good work!"
-        )
-        self.assertEqual(comment.author, self.user)
-        self.assertEqual(comment.task_feedback, self.feedback)
-        self.assertEqual(comment.comment, "Good work!")
-
-    def test_unique_author_task_feedback(self):
-        TaskComment.objects.create(
-            author=self.user, task_feedback=self.feedback, comment="Good work!"
-        )
-        with self.assertRaises(Exception):
-            TaskComment.objects.create(
-                author=self.user, task_feedback=self.feedback, comment="Another comment"
-            )

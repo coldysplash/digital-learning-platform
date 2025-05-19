@@ -12,4 +12,5 @@
   <button hx-get="{% url 'construct:module_edit' module.id %}" hx-target="#modal" hx-swap="outerHTML" class="btn btn-secondary mt-3">Редактировать</button>
   <a hx-get="{% url 'construct:module_delete' module.id %}" hx-target="#modal" hx-swap="outerHTML" class="btn btn-secondary mt-3">Удалить</a>
   <button hx-get="{% url 'construct:lesson_create' module.id %}" hx-target="#modal" hx-swap="outerHTML" class="btn btn-secondary mt-3">Добавить урок</button>
+  <button hx-get="{% url 'construct:test_create' module.id %}" hx-target="#modal" hx-swap="outerHTML" class="btn btn-secondary mt-3">Добавить тест</button>
 </div>

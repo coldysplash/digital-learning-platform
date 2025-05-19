@@ -1,0 +1,12 @@
+{% load crispy_forms_tags %}
+
+<div class="container mt-5" id="modal" style="display: block;">
+  <form hx-post="{% url 'construct:test_edit' test.id %}">
+    {% csrf_token %}
+    {{ form.title|as_crispy_field }}
+    {{ form.description|as_crispy_field }}
+    {{ form.passing_score|as_crispy_field }}
+    <button type="submit" class="btn btn-primary mt-3">Сохранить изменения</button>
+    <a hx-get="{% url 'construct:test_detail' test.id %}" hx-target="#modal" hx-swap="outerHTML" class="btn btn-secondary mt-3">Отмена</a>
+  </form>
+</div>

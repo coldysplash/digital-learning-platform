@@ -1,7 +1,6 @@
 from django import forms
-from django.core.exceptions import ValidationError
 
-from .models import Module, Lesson, TextContent, FileContent, LinkContent, ImageContent
+from .models import *
 
 
 class ModuleForm(forms.ModelForm):
@@ -46,3 +45,21 @@ class ImageContentForm(forms.ModelForm):
     class Meta:
         model = ImageContent
         fields = ["image"]
+
+
+class TestForm(forms.ModelForm):
+    class Meta:
+        model = Test
+        fields = ["title", "description", "passing_score"]
+
+
+class QuestionForm(forms.ModelForm):
+    class Meta:
+        model = Questions
+        fields = ["question"]
+
+
+class AnswerForm(forms.ModelForm):
+    class Meta:
+        model = Answers
+        fields = ["answer", "flag"]
