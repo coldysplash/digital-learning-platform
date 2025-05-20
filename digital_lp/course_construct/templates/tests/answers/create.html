@@ -1,0 +1,10 @@
+{% load crispy_forms_tags %}
+
+<div class="container mt-5" id="modal" style="display: block;">
+  <form hx-post="{% url 'construct:answer_create' question_id=question.id %}">
+    {% csrf_token %}
+    {{ form.answer|as_crispy_field }}
+    <button type="submit" class="btn btn-primary mt-3">Сохранить изменения</button>
+    <a hx-get="{% url 'construct:question_detail' pk=question.id %}" hx-target="#modal" hx-swap="outerHTML" class="btn btn-secondary mt-3">Отмена</a>
+  </form>
+</div>

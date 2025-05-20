@@ -125,7 +125,7 @@ class LessonViewsTests(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(
-            response, reverse("construct:main", kwargs={"pk": self.course.id})
+            response, reverse("construct:main", kwargs={"course_id": self.course.id})
         )
         self.assertFalse(Lesson.objects.filter(id=self.lesson.id).exists())
         second_lesson.refresh_from_db()

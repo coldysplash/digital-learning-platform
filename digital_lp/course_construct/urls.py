@@ -4,8 +4,9 @@ from . import views
 
 app_name = "construct"
 
+# main and modules urls
 urlpatterns = [
-    path("course/<int:pk>/", views.ConstructorCourseView.as_view(), name="main"),
+    path("course/<int:course_id>/", views.ConstructorCourseView.as_view(), name="main"),
     path(
         "course/<int:course_id>/module/create/",
         views.ModuleCreateView.as_view(),
@@ -18,6 +19,10 @@ urlpatterns = [
         views.module_delete,
         name="module_delete",
     ),
+]
+
+# lesson urls
+urlpatterns += [
     path(
         "module/<int:module_id>/lesson/create/",
         views.LessonCreateView.as_view(),
@@ -32,7 +37,7 @@ urlpatterns = [
     ),
 ]
 
-# lesson content
+# lesson content urls
 urlpatterns += [
     path(
         "lesson/<int:lesson_id>/content/text/create/",
@@ -66,7 +71,7 @@ urlpatterns += [
     ),
 ]
 
-# test crud
+# test urls
 urlpatterns += [
     path(
         "module/<int:module_id>/test/create/",
@@ -79,5 +84,48 @@ urlpatterns += [
         "test/<int:pk>/delete/",
         views.test_delete,
         name="test_delete",
+    ),
+]
+
+# questions ursl
+urlpatterns += [
+    path(
+        "test/<int:test_id>/question/create/",
+        views.QuestionCreateView.as_view(),
+        name="add_question",
+    ),
+    path(
+        "question/<int:pk>/detail/",
+        views.QuestionDetailView.as_view(),
+        name="question_detail",
+    ),
+    path(
+        "question/<int:pk>/edit/",
+        views.QuestionUpdateView.as_view(),
+        name="question_edit",
+    ),
+    path(
+        "question/<int:pk>/delete/",
+        views.question_delete,
+        name="question_delete",
+    ),
+]
+
+# answers ursl
+urlpatterns += [
+    path(
+        "question/<int:question_id>/answer/create",
+        views.AnswerCreateView.as_view(),
+        name="answer_create",
+    ),
+    path(
+        "answer/<int:pk>/edit/",
+        views.AnswerUpdateView.as_view(),
+        name="answer_edit",
+    ),
+    path(
+        "answer/<int:pk>/delete/",
+        views.AnswerDeleteView.as_view(),
+        name="answer_delete",
     ),
 ]

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.db import transaction
 from django.views.generic import (
@@ -12,37 +12,44 @@ from django.views.generic import (
     DeleteView,
 )
 
-from .utils import delete_item_and_refresh_order
+from .utils import (
+    delete_item_in_module,
+    delete_item_in_test,
+    delete_module_in_course,
+    AuthorRequiredMixin,
+)
 from .models import *
 from .forms import *
 from users.views import author_required
 
 
-class ConstructorCourseView(LoginRequiredMixin, ListView):
+class ConstructorCourseView(LoginRequiredMixin, AuthorRequiredMixin, ListView):
     model = Module
     template_name = "construct/main.html"
-    context_object_name = "module_list"
-
-    def get_queryset(self):
-        course = get_object_or_404(Course, id=self.kwargs["pk"])
-        return Module.objects.filter(course=course)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        course = get_object_or_404(Course, id=self.kwargs["pk"])
+        course = get_object_or_404(Course, id=self.kwargs["course_id"])
         context["course"] = course
-        context["lessons"] = Lesson.objects.filter(module__course=course).order_by(
-            "module__order", "order"
+        context["module_list"] = Module.objects.filter(course=course).select_related(
+            "course"
         )
-        context["tests"] = Test.objects.filter(module__course=course).order_by(
-            "module__order", "order"
+        context["lessons"] = (
+            Lesson.objects.filter(module__course=course)
+            .order_by("module__order", "order")
+            .select_related("module")
+        )
+        context["tests"] = (
+            Test.objects.filter(module__course=course)
+            .order_by("module__order", "order")
+            .select_related("module")
         )
 
         return context
 
 
 # Module CRUD
-class ModuleDetailView(LoginRequiredMixin, DetailView):
+class ModuleDetailView(LoginRequiredMixin, AuthorRequiredMixin, DetailView):
     model = Module
     template_name = "modules/module.html"
     context_object_name = "module"
@@ -53,7 +60,7 @@ class ModuleDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class ModuleCreateView(LoginRequiredMixin, CreateView):
+class ModuleCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView):
     model = Module
     form_class = ModuleForm
     template_name = "modules/create.html"
@@ -67,7 +74,9 @@ class ModuleCreateView(LoginRequiredMixin, CreateView):
         return response
 
     def get_success_url(self):
-        return reverse_lazy("construct:main", kwargs={"pk": self.kwargs["course_id"]})
+        return reverse_lazy(
+            "construct:main", kwargs={"course_id": self.kwargs["course_id"]}
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -75,13 +84,15 @@ class ModuleCreateView(LoginRequiredMixin, CreateView):
         return context
 
 
-class ModuleUpdateView(LoginRequiredMixin, UpdateView):
+class ModuleUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
     model = Module
     form_class = ModuleForm
     template_name = "modules/form.html"
 
     def get_success_url(self):
-        return reverse_lazy("construct:main", kwargs={"pk": self.object.course.id})
+        return reverse_lazy(
+            "construct:main", kwargs={"course_id": self.object.course.id}
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -96,14 +107,8 @@ def module_delete(request, pk):
     module = get_object_or_404(Module, id=pk)
     course = module.course
     if request.method == "POST":
-        module.delete()
-        # Обновляем order для оставшихся модулей
-        for index, mod in enumerate(course.module_set.all(), start=1):
-            if mod.order != index:
-                mod.order = index
-                mod.save()
-        messages.success(request, "Модуль удален!")
-        return redirect("construct:main", pk=course.id)
+        delete_module_in_course(module, course)
+        return redirect("construct:main", course_id=course.id)
 
     return render(
         request,
@@ -113,7 +118,7 @@ def module_delete(request, pk):
 
 
 # Lesson CRUD
-class LessonCreateView(LoginRequiredMixin, CreateView):
+class LessonCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView):
     model = Lesson
     form_class = LessonForm
     template_name = "lessons/create.html"
@@ -134,19 +139,18 @@ class LessonCreateView(LoginRequiredMixin, CreateView):
         return context
 
 
-class LessonDetailView(LoginRequiredMixin, DetailView):
+class LessonDetailView(LoginRequiredMixin, AuthorRequiredMixin, DetailView):
     model = Lesson
     template_name = "lessons/lesson.html"
     context_object_name = "lesson"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Добавляем контент урока в контекст
         context["contents"] = self.object.contents.all()
         return context
 
 
-class LessonUpdateView(LoginRequiredMixin, UpdateView):
+class LessonUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
     model = Lesson
     form_class = LessonForm
     template_name = "lessons/form.html"
@@ -162,9 +166,8 @@ def lesson_delete(request, pk):
     module = lesson.module
     course = module.course
     if request.method == "POST":
-        delete_item_and_refresh_order(module, lesson)
-        messages.success(request, "Урок удален!")
-        return redirect("construct:main", pk=course.id)
+        delete_item_in_module(lesson)
+        return redirect("construct:main", course_id=course.id)
 
     return render(
         request,
@@ -174,7 +177,7 @@ def lesson_delete(request, pk):
 
 
 # Базовое представление для создания контента
-class BaseContentCreateView(LoginRequiredMixin, CreateView):
+class BaseContentCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView):
     template_name = "lessons/content/create_form.html"
 
     def form_valid(self, form):
@@ -213,7 +216,7 @@ class ImageContentCreateView(BaseContentCreateView):
 
 
 # Представление для редактирования контента
-class ContentUpdateView(LoginRequiredMixin, UpdateView):
+class ContentUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
     template_name = "lessons/content/edit_form.html"
 
     def get_object(self):
@@ -239,7 +242,7 @@ class ContentUpdateView(LoginRequiredMixin, UpdateView):
 
 
 # Представление для удаления контента
-class ContentDeleteView(LoginRequiredMixin, DeleteView):
+class ContentDeleteView(LoginRequiredMixin, AuthorRequiredMixin, DeleteView):
     model = LessonContent
     template_name = "lessons/content/confirm_delete.html"
 
@@ -263,7 +266,7 @@ class ContentDeleteView(LoginRequiredMixin, DeleteView):
 
 
 # Tests CRUD
-class TestCreateView(LoginRequiredMixin, CreateView):
+class TestCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView):
     model = Test
     form_class = TestForm
     template_name = "tests/create.html"
@@ -284,17 +287,20 @@ class TestCreateView(LoginRequiredMixin, CreateView):
         return context
 
 
-class TestDetailView(LoginRequiredMixin, DetailView):
+class TestDetailView(LoginRequiredMixin, AuthorRequiredMixin, DetailView):
     model = Test
     template_name = "tests/test_detail.html"
     context_object_name = "test"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["questions"] = Questions.objects.filter(test=self.object).order_by(
+            "order"
+        )
         return context
 
 
-class TestUpdateView(LoginRequiredMixin, UpdateView):
+class TestUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
     model = Test
     form_class = TestForm
     template_name = "tests/form.html"
@@ -308,13 +314,126 @@ class TestUpdateView(LoginRequiredMixin, UpdateView):
 def test_delete(request, pk):
     test = get_object_or_404(Test, id=pk)
     module = test.module
-    course = module.course
     if request.method == "POST":
-        delete_item_and_refresh_order(module, test)
-        return redirect("construct:main", pk=course.id)
+        delete_item_in_module(test)
+        return redirect("construct:module", pk=module.id)
 
     return render(
         request,
         "tests/confirm_delete.html",
         {"test": test, "module": module},
     )
+
+
+# Questions CRUD
+class QuestionCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView):
+    model = Questions
+    form_class = QuestionForm
+    template_name = "tests/questions/create.html"
+
+    def form_valid(self, form):
+        test = get_object_or_404(Test, id=self.kwargs["test_id"])
+        count_quest = Questions.objects.filter(test=test).count()
+        form.instance.order = count_quest + 1
+        form.instance.test = test
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy(
+            "construct:test_detail", kwargs={"pk": self.kwargs["test_id"]}
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["test"] = get_object_or_404(Test, id=self.kwargs["test_id"])
+        return context
+
+
+class QuestionDetailView(LoginRequiredMixin, AuthorRequiredMixin, DetailView):
+    model = Questions
+    template_name = "tests/questions/detail.html"
+    context_object_name = "question"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["test"] = get_object_or_404(Test, id=self.object.test.id)
+        context["answers"] = Answers.objects.filter(question=self.object)
+        return context
+
+
+class QuestionUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
+    model = Questions
+    form_class = QuestionForm
+    template_name = "tests/questions/form.html"
+
+    def get_success_url(self):
+        return reverse_lazy("construct:test_detail", kwargs={"pk": self.kwargs["pk"]})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["question"] = self.object
+        context["test"] = self.object.test
+        return context
+
+
+@login_required
+@author_required
+def question_delete(request, pk):
+    question = get_object_or_404(Questions, id=pk)
+    if request.method == "POST":
+        delete_item_in_test(question)
+        return redirect("construct:test_detail", pk=question.test.id)
+
+
+class AnswerCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView):
+    model = Answers
+    form_class = AnswerForm
+    template_name = "tests/answers/create.html"
+
+    def form_valid(self, form):
+        form.instance.question = get_object_or_404(
+            Questions, id=self.kwargs["question_id"]
+        )
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy(
+            "construct:question_detail",
+            kwargs={"pk": self.kwargs["question_id"]},
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["question"] = get_object_or_404(
+            Questions, id=self.kwargs["question_id"]
+        )
+        return context
+
+
+class AnswerUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
+    model = Answers
+    form_class = AnswerForm
+    template_name = "tests/answers/form.html"
+    context_object_name = "answer"
+
+    def get_success_url(self):
+        question = self.object.question
+        return reverse_lazy(
+            "construct:question_detail",
+            kwargs={"pk": question.id},
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["question"] = self.object.question
+        return context
+
+
+class AnswerDeleteView(LoginRequiredMixin, AuthorRequiredMixin, DeleteView):
+    model = Answers
+
+    def get_success_url(self):
+        return reverse_lazy(
+            "construct:question_detail",
+            kwargs={"pk": self.object.question.id},
+        )
