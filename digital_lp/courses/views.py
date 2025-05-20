@@ -1,12 +1,13 @@
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, CreateView, DeleteView
 from django.db.models import Q
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+from django.shortcuts import redirect
 
 from .models import Course, Category
 from .forms import CourseForm
 from learn.models import CourseProgress, FavoritesCourses
-from users.views import author_required
+from course_construct.utils import AuthorRequiredMixin
 
 
 class CatalogView(ListView):
@@ -62,22 +63,26 @@ class CourseDetailView(DetailView):
         return context
 
 
-@login_required
-@author_required
-def course_create(request):
-    user = request.user
-    if request.method == "POST":
-        form = CourseForm(request.POST, request.FILES)
-        if form.is_valid():
-            course = form.save(commit=False)
-            course.author = user
-            course.save()
-            return redirect("construct:main", course_id=course.id)
-    else:
-        form = CourseForm()
+class CourseCreateView(LoginRequiredMixin, CreateView):
+    model = Course
+    form_class = CourseForm
+    template_name = "courses/create.html"
 
-    return render(
-        request,
-        "courses/create.html",
-        {"form": form, "categories": Category.objects.all()},
-    )
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy("construct:main", kwargs={"course_id": self.object.id})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["categories"] = Category.objects.all()
+        return context
+
+
+class CourseDeleteView(LoginRequiredMixin, AuthorRequiredMixin, DeleteView):
+    model = Course
+    template_name = "courses/confirm_delete.html"
+    context_object_name = "course"
+    success_url = reverse_lazy("users:profile")

@@ -26,12 +26,13 @@
                   <h6>Доступен: {{ course.available }}</h6>
                   <h6>Верификация: {{ course.verified }}</h6>
                   <h6>Последние изменения: {{ course.pub_date }}</h6>
-                  <a href="{% url 'construct:main' course.id %}"><button type="button" class="btn btn-success btn-lg">Редактировать</button></a>
+                  <a href="{% url 'construct:main' course.id %}" class="btn btn-success btn-lg">Редактировать</a>
+                  <a href="{% url 'courses:delete' course.id %}">Удалить курс</a>
                 </div>
               </div>
             </div>
           {% endfor %}
-          <a href="{% url 'courses:create' %}"><button type="button" class="btn btn-success btn-lg">Создать курс</button></a>
+          <a href="{% url 'courses:create' %}" class="btn btn-success btn-lg">Создать курс</a>
         </div>
       </div>
     </div>
