@@ -34,20 +34,20 @@ class TestResults(models.Model):
         unique_together = ["student", "test"]
 
 
-class TaskFeedback(models.Model):
-    student = models.ForeignKey(User, on_delete=models.CASCADE)
-    task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    solution = models.FileField(upload_to="task_solutions/%Y/%m/%d", blank=True)
-    grade = models.PositiveSmallIntegerField(blank=True, null=True)
+# class TaskFeedback(models.Model):
+#     student = models.ForeignKey(User, on_delete=models.CASCADE)
+#     task = models.ForeignKey(Task, on_delete=models.CASCADE)
+#     solution = models.FileField(upload_to="task_solutions/%Y/%m/%d", blank=True)
+#     grade = models.PositiveSmallIntegerField(blank=True, null=True)
 
-    class Meta:
-        unique_together = ["student", "task"]
+#     class Meta:
+#         unique_together = ["student", "task"]
 
 
-class TaskComment(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
-    task_feedback = models.ForeignKey(TaskFeedback, on_delete=models.CASCADE)
-    comment = models.TextField()
+# class TaskComment(models.Model):
+#     author = models.ForeignKey(User, on_delete=models.CASCADE)
+#     task_feedback = models.ForeignKey(TaskFeedback, on_delete=models.CASCADE)
+#     comment = models.TextField()
 
-    class Meta:
-        unique_together = ["author", "task_feedback"]
+#     class Meta:
+#         unique_together = ["author", "task_feedback"]

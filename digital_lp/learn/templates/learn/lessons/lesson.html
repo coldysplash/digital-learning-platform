@@ -1,0 +1,20 @@
+{% extends 'layouts/learn.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <div class="row">
+    {% include 'learn/partials/sidenav.html' %}
+
+    <div class="col border">
+      {{ lesson.order }}
+      {{ lesson.title }}
+      {{ lesson.description }}
+      <h3>Content</h3>
+      <ul>
+        {% for content in contents %}
+          <li>{{ content.content_type.model }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+{% endblock %}

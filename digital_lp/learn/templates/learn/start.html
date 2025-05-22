@@ -1,0 +1,13 @@
+{% extends 'layouts/learn.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <div class="row">
+    {% include 'learn/partials/sidenav.html' %}
+
+    <div class="col border" id="main">
+      <h5>Добро пожаловать на курс от {{ course.author.first_name }}</h5>
+      Описание курса: {{ course.description }}
+    </div>
+  </div>
+{% endblock %}

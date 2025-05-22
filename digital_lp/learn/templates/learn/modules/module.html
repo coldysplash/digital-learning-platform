@@ -1,0 +1,19 @@
+{% extends 'layouts/learn.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <div class="row">
+    {% include 'learn/partials/sidenav.html' %}
+
+    <div class="col border">
+      {{ module.order }}<br />
+      {{ module.name }}<br />
+      {{ module.description }}<br />
+      <h5>Список уроков в данном модуле</h5>
+      {% for lesson in lessons %}
+        {{ lesson.order }}
+        {{ lesson.title }}<br />
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

@@ -1,10 +1,11 @@
 {% load static %}
+{% if request.use_layout %}
 <!DOCTYPE html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Constructor</title>
+    <title>Learn</title>
 
     <script src="https://unpkg.com/htmx.org@1.9.10/dist/htmx.min.js"></script>
 
@@ -19,7 +20,7 @@
       <header>
         <nav class="navbar navbar-expand-sm">
           <div class="container border-bottom border-top py-2 my-3">
-            <h3>Редактирование курса</h3>
+            <h3>Обучение</h3>
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
               <ul class="navbar-nav flex-grow-1">
                 <li class="nav-item ms-auto">
@@ -32,12 +33,16 @@
       </header>
     </div>
 
+
     <div class="wrapper">
-      <div class="content">
+{% endif %}
+  
+      <div class="content" id="main">
         {% block content %}
 
         {% endblock %}
       </div>
+{% if request.use_layout %}
 
       <div class="footer">
         <div class="container">
@@ -56,7 +61,11 @@
         </div>
       </div>
     </div>
+{% endif %}
+
     {% comment %}js for bootstrap{% endcomment %}
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
   </body>
 </html>
+
+

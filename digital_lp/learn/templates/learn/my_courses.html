@@ -18,6 +18,7 @@
                 <img src="{{ item.course.image.url }}" alt="{{ item.course.name }}" class="img-course img-thumbnail" />
                 <div class="card-body">
                   <h4 class="card-title">Название: {{ item.course.name }}</h4>
+                  <a href="{% url 'learn:start' item.course.id %}">Начать обучение</a>
                 </div>
               </div>
             </div>

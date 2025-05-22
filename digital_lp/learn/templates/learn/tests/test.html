@@ -1,0 +1,15 @@
+{% extends 'layouts/learn.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <div class="row">
+    {% include 'learn/partials/sidenav.html' %}
+
+    <div class="col border">
+      {{ test.order }}
+      {{ test.title }}
+      {{ test.description }}
+      <a href="#" class="button">начать тест</a>
+    </div>
+  </div>
+{% endblock %}
