@@ -6,12 +6,11 @@ from .models import User
 class UserAdmin(admin.ModelAdmin):
     list_display = (
         "email",
-        "first_name",
-        "last_name",
+        "name",
         "is_staff",
         "is_author",
     )
-    search_fields = ("email", "first_name", "last_name")
+    search_fields = ("email", "name")
     list_filter = ("is_staff", "is_active", "is_author")
     ordering = ("email",)
 
@@ -19,7 +18,7 @@ class UserAdmin(admin.ModelAdmin):
         (None, {"fields": ("email", "password")}),
         (
             "Personal Info",
-            {"fields": ("first_name", "last_name", "image")},
+            {"fields": ("name", "image")},
         ),
         (
             "Permissions",

@@ -2,19 +2,85 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-  <div class="row">
-    {% include 'learn/partials/sidenav.html' %}
+<div class="row">
+  {% include 'learn/partials/sidenav.html' %}
 
-    <div class="col border">
-      {{ lesson.order }}
-      {{ lesson.title }}
-      {{ lesson.description }}
-      <h3>Content</h3>
-      <ul>
-        {% for content in contents %}
-          <li>{{ content.content_type.model }}</li>
-        {% endfor %}
-      </ul>
+  <div class="col-lg-9" id="main">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <nav aria-label="breadcrumb" class="mb-4">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'learn:start' lesson.module.course.id %}">Главная страница курса</a></li>
+            <li class="breadcrumb-item"><a hx-get="{% url 'learn:module' lesson.module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML">Модуль {{ lesson.module.order }}</a></li>
+            <li class="breadcrumb-item active">Урок {{ lesson.order }}</li>
+          </ol>
+        </nav>
+        
+        <h2 class="mb-4">{{ lesson.title }}</h2>
+        
+        <div class="bg-light p-4 rounded mb-4">
+          <p>{{ lesson.description }}</p>
+        </div>
+        
+        <div class="lesson-content mb-5">
+          {% for content in contents %}
+            <div class="content-item mb-4">
+              {% if content.content_type.model == 'textcontent' %}
+                <div class="card border-0">
+                  <div class="card-body">
+                    <h5 class="card-title mb-3">Текстовый контент</h5>
+                    <div class="text-content">
+                      {{ content.content_object.text|linebreaks }}
+                    </div>
+                  </div>
+                </div>
+              {% elif content.content_type.model == 'imagecontent' %}
+                <div class="card border-0">
+                  <div class="card-body">
+                    <h5 class="card-title mb-3">Изображение</h5>
+                    <img src="{{ content.content_object.image.url }}" alt="Изображение урока" class="img-fluid rounded">
+                  </div>
+                </div>
+              {% elif content.content_type.model == 'filecontent' %}
+                <div class="card border-0">
+                  <div class="card-body">
+                    <h5 class="card-title mb-3">Прикрепленный файл</h5>
+                    <a href="{{ content.content_object.file.url }}" class="btn btn-outline-primary" download>
+                      <i class="fas fa-download me-2"></i>Скачать файл
+                    </a>
+                  </div>
+                </div>
+              {% elif content.content_type.model == 'linkcontent' %}
+                <div class="card border-0">
+                  <div class="card-body">
+                    <h5 class="card-title mb-3">Внешний ресурс</h5>
+                    <a href="{{ content.content_object.url }}" class="btn btn-outline-primary" target="_blank">
+                      <i class="fas fa-external-link-alt me-2"></i>Перейти по ссылке
+                    </a>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+        
+        <div class="d-flex justify-content-between">
+          <button hx-get="{% url 'learn:module' lesson.module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" 
+                  class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-1"></i>Вернуться к модулю
+          </button>
+          
+          <button class="btn btn-success">
+            <i class="fas fa-check-circle me-1"></i>Отметить как завершенный
+          </button>
+          
+          <!-- Next lesson button would go here if we had the next lesson information -->
+          <button class="btn btn-primary">
+            Следующий урок<i class="fas fa-arrow-right ms-1"></i>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
+</div>
 {% endblock %}

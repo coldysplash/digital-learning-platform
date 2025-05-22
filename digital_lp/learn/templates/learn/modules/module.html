@@ -2,18 +2,78 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-  <div class="row">
-    {% include 'learn/partials/sidenav.html' %}
+<div class="row">
+  {% include 'learn/partials/sidenav.html' %}
 
-    <div class="col border">
-      {{ module.order }}<br />
-      {{ module.name }}<br />
-      {{ module.description }}<br />
-      <h5>Список уроков в данном модуле</h5>
-      {% for lesson in lessons %}
-        {{ lesson.order }}
-        {{ lesson.title }}<br />
-      {% endfor %}
+  <div class="col-lg-9" id="main">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <nav aria-label="breadcrumb" class="mb-4">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'learn:start' module.course.id %}">Главная страница курса</a></li>
+            <li class="breadcrumb-item active">Модуль {{ module.order }}: {{ module.name }}</li>
+          </ol>
+        </nav>
+        
+        <h2 class="mb-4">Модуль {{ module.order }}: {{ module.name }}</h2>
+        
+        <div class="bg-light p-4 rounded mb-4">
+          <h5 class="mb-3">Обзор модуля</h5>
+          <p>{{ module.description }}</p>
+        </div>
+        
+        <h5 class="mb-3">Содержание модуля</h5>
+        <div class="list-group mb-4">
+          {% for lesson in lessons %}
+            {% if lesson.module.id == module.id %}
+              <button hx-get="{% url 'learn:lesson' lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" 
+                      class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <div>
+                  <i class="fas fa-book text-primary me-2"></i>
+                  <span>Урок {{ lesson.order }}: {{ lesson.title }}</span>
+                </div>
+                <span class="badge bg-primary rounded-pill">
+                  <i class="fas fa-arrow-right"></i>
+                </span>
+              </button>
+            {% endif %}
+          {% endfor %}
+          
+          {% for test in tests %}
+            {% if test.module.id == module.id %}
+              <button hx-get="{% url 'learn:test' test.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" 
+                      class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <div>
+                  <i class="fas fa-tasks text-primary me-2"></i>
+                  <span>Тест {{ test.order }}: {{ test.title }}</span>
+                </div>
+                <span class="badge bg-primary rounded-pill">
+                  <i class="fas fa-arrow-right"></i>
+                </span>
+              </button>
+            {% endif %}
+          {% endfor %}
+        </div>
+        
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'learn:start' module.course.id %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-1"></i>Вернуться на главную
+          </a>
+          
+          {% if lessons.0 %}
+            <button hx-get="{% url 'learn:lesson' lessons.0.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" 
+                    class="btn btn-primary">
+              Начать первый урок<i class="fas fa-arrow-right ms-1"></i>
+            </button>
+          {% elif tests.0 %}
+            <button hx-get="{% url 'learn:test' tests.0.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" 
+                    class="btn btn-primary">
+              Начать первый тест<i class="fas fa-arrow-right ms-1"></i>
+            </button>
+          {% endif %}
+        </div>
+      </div>
     </div>
   </div>
+</div>
 {% endblock %}

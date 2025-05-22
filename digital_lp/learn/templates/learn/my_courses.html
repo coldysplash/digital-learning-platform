@@ -2,29 +2,67 @@
 {% load static %}
 
 {% block content %}
-  <h3>Мои курсы</h3>
-  {% if student_courses|length == 0 %}
-    <div class="text-center">
-      <h3 class="mt-5">Вы еще не записались ни на один курс</h3>
-      <a href="{% url 'courses:catalog' %}">Смотреть каталог</a>
-    </div>
-  {% else %}
-    <div class="course-list">
-      <div class="container-md">
-        <div class="row row-cols-3">
-          {% for item in student_courses %}
-            <div class="col-sm-6">
-              <div class="card">
-                <img src="{{ item.course.image.url }}" alt="{{ item.course.name }}" class="img-course img-thumbnail" />
-                <div class="card-body">
-                  <h4 class="card-title">Название: {{ item.course.name }}</h4>
-                  <a href="{% url 'learn:start' item.course.id %}">Начать обучение</a>
-                </div>
-              </div>
-            </div>
-          {% endfor %}
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2 class="mb-0"><i class="fas fa-book-open text-primary me-2"></i>Мое обучение</h2>
+          <a href="{% url 'courses:catalog' %}" class="btn btn-primary">
+            <i class="fas fa-search me-1"></i>Просмотреть больше курсов
+          </a>
         </div>
       </div>
     </div>
-  {% endif %}
+  </div>
+</div>
+
+{% if student_courses|length == 0 %}
+  <div class="card shadow-sm">
+    <div class="card-body text-center py-5">
+      <i class="fas fa-graduation-cap fa-4x text-muted mb-3"></i>
+      <h3>Вы еще не записаны ни на один курс</h3>
+      <p class="text-muted mb-4">Изучите наш каталог курсов и начните свой путь обучения сегодня.</p>
+      <a href="{% url 'courses:catalog' %}" class="btn btn-primary btn-lg">
+        <i class="fas fa-search me-1"></i>Просмотреть курсы
+      </a>
+    </div>
+  </div>
+{% else %}
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for item in student_courses %}
+      <div class="col">
+        <div class="card h-100">
+          <div class="position-relative">
+            <img src="{{ item.course.image.url }}" alt="{{ item.course.name }}" class="card-img-top img-course">
+            <div class="position-absolute bottom-0 start-0 w-100 bg-dark bg-opacity-75 text-white p-2">
+              <div class="d-flex justify-content-between align-items-center">
+                <span>Прогресс</span>
+                <span>{{ item.progress_percentages }}%</span>
+              </div>
+              <div class="progress" style="height: 8px;">
+                <div class="progress-bar bg-success" role="progressbar" style="width: {{ item.progress_percentages }}%" 
+                     aria-valuenow="{{ item.progress_percentages }}" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">{{ item.course.name }}</h5>
+            <p class="card-text text-truncate">{{ item.course.description }}</p>
+            <p class="text-muted small mb-0">
+              <i class="fas fa-calendar-alt me-1"></i>Записан: {{ item.added_date }}
+            </p>
+          </div>
+          <div class="card-footer bg-white border-top-0">
+            <div class="d-grid">
+              <a href="{% url 'learn:start' item.course.id %}" class="btn btn-primary">
+                <i class="fas fa-play-circle me-1"></i>Продолжить обучение
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
 {% endblock %}

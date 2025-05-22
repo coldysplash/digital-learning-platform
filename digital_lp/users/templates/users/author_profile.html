@@ -2,45 +2,104 @@
 {% load static %}
 
 {% block content %}
-  <div class="profile-info">
-    <p>First Name: {{ user.first_name }}</p>
-    <p>Last Name: {{ user.last_name }}</p>
-    <p>Email: {{ user.email }}</p>
-  </div>
-  <h3>Мои курсы</h3>
-  {% if courses|length == 0 %}
-    <div class="text-center">
-      <h3 class="mt-5">Вы еще не создали ни один курс</h3>
-      <a href="{% url 'courses:create' %}"><button type="button" class="btn btn-success btn-lg">Создать курс</button></a>
-    </div>
-  {% else %}
-    <div class="course-list">
-      <div class="container-md">
-        <div class="row row-cols-3">
-          {% for course in courses %}
-            <div class="col-sm-6">
-              <div class="card">
-                <img src="{{ course.image.url }}" alt="{{ course.name }}" class="img-course img-thumbnail" />
-                <div class="card-body">
-                  <h4 class="card-title">Название: {{ course.name }}</h4>
-                  <h6>Доступен: {{ course.available }}</h6>
-                  <h6>Верификация: {{ course.verified }}</h6>
-                  <h6>Последние изменения: {{ course.pub_date }}</h6>
-                  <a href="{% url 'construct:main' course.id %}" class="btn btn-success btn-lg">Редактировать</a>
-                  <a href="{% url 'courses:delete' course.id %}">Удалить курс</a>
-                </div>
-              </div>
+  <div class="row">
+    <div class="col-lg-4">
+      <div class="card shadow mb-4">
+        <div class="card-body text-center">
+          {% if user.image %}
+            <img src="{{ user.image.url }}" class="rounded-circle img-thumbnail mb-3" style="width: 150px; height: 150px; object-fit: cover;" />
+          {% else %}
+            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 150px; height: 150px;">
+              <span class="text-white display-4">{{ user.name|first|upper }}</span>
             </div>
-          {% endfor %}
-          <a href="{% url 'courses:create' %}" class="btn btn-success btn-lg">Создать курс</a>
+          {% endif %}
+          <h3 class="mb-1">{{ user.name }}</h3>
+          <p class="text-muted mb-3">Автор курсов</p>
+          <div class="d-grid gap-2">
+            <a href="{% url 'users:edit_profile' %}" class="btn btn-primary"><i class="fas fa-edit me-2"></i>Редактировать профиль</a>
+            <a href="{% url 'users:user_logout' %}" class="btn btn-outline-danger"><i class="fas fa-sign-out-alt me-2"></i>Выйти</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow">
+        <div class="card-header bg-white">
+          <h5 class="card-title mb-0">Информация об аккаунте</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <h6 class="text-muted mb-1">Email</h6>
+            <p class="mb-0">{{ user.email }}</p>
+          </div>
+          <div class="mb-3">
+            <h6 class="text-muted mb-1">Имя</h6>
+            <p class="mb-0">{{ user.name|default:'Не указано' }}</p>
+          </div>
         </div>
       </div>
     </div>
-  {% endif %}
 
-  <form method="post" class="user_logout">
-    <div class="profile-buttons mt-4 d-flex justify-content-between">
-      <a href="{% url 'users:user_logout' %}" class="logout-btn d-flex align-items-center">Log out of your account</a>
+    <div class="col-lg-8">
+      <div class="card shadow">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">Мои курсы</h5>
+          <a href="{% url 'courses:create' %}" class="btn btn-sm btn-primary"><i class="fas fa-plus me-1"></i>Создать новый курс</a>
+        </div>
+        <div class="card-body">
+          {% if courses|length == 0 %}
+            <div class="text-center py-5">
+              <i class="fas fa-chalkboard-teacher fa-4x text-muted mb-3"></i>
+              <h4>Курсы еще не созданы</h4>
+              <p class="text-muted">Начните создавать свой первый курс, чтобы делиться знаниями со студентами.</p>
+              <a href="{% url 'courses:create' %}" class="btn btn-primary mt-2"><i class="fas fa-plus me-1"></i>Создать первый курс</a>
+            </div>
+          {% else %}
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+              {% for course in courses %}
+                <div class="col">
+                  <div class="card h-100 border">
+                    <img src="{{ course.image.url }}" alt="{{ course.name }}" class="card-img-top img-course" />
+                    <div class="card-body">
+                      <h5 class="card-title">{{ course.name }}</h5>
+                      <div class="d-flex mb-3">
+                        <span class="badge {% if course.available %}
+                            bg-success
+                          {% else %}
+                            bg-secondary
+                          {% endif %} me-2">
+                          {% if course.available %}
+                            Доступен
+                          {% else %}
+                            Черновик
+                          {% endif %}
+                        </span>
+                        <span class="badge {% if course.verified %}
+                            bg-info
+                          {% else %}
+                            bg-warning
+                          {% endif %}">
+                          {% if course.verified %}
+                            Проверен
+                          {% else %}
+                            Ожидает проверки
+                          {% endif %}
+                        </span>
+                      </div>
+                      <p class="card-text small text-muted">Последнее обновление: {{ course.pub_date|default:'Не опубликован' }}</p>
+                    </div>
+                    <div class="card-footer bg-white border-top-0">
+                      <div class="d-flex justify-content-between">
+                        <a href="{% url 'construct:main' course.id %}" class="btn btn-primary"><i class="fas fa-edit me-1"></i>Редактировать</a>
+                        <a href="{% url 'courses:delete' course.id %}" class="btn btn-outline-danger"><i class="fas fa-trash-alt me-1"></i>Удалить</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
     </div>
-  </form>
+  </div>
 {% endblock %}

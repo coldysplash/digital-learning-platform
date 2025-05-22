@@ -4,71 +4,79 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Learning-Platform</title>
+    <title>Learning Platform</title>
 
-    {% comment %}bootstrap{% endcomment %}
-    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.css' %}" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-    {% comment %}css{% endcomment %}
-    <link rel="stylesheet" href="{% static 'css/index.css' %}" />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
   </head>
   <body>
-    <div class="header mb-4">
-      <header>
-        <nav class="navbar navbar-expand-sm">
-          <div class="container border-bottom border-top py-2 my-3">
-            {% if user.is_authenticated %}
-              {% if user.is_author %}
-                <a href="{% url 'users:profile' %}" class="navbar-brand text-white">Learning-Platform</a>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                  <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item ms-auto">
-                      <a href="{% url 'users:profile' %}" class="nav-link text-white">Профиль</a>
-                    </li>
-                    <li class="nav-item">
-                      <a href="{% url 'users:user_logout' %}" class="nav-link text-white">Выход</a>
-                    </li>
-                  </ul>
-                </div>
-              {% else %}
-                <a href="{% url 'courses:catalog' %}" class="navbar-brand text-white">Learning-Platform</a>
-
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                  <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item ms-auto">
-                      <a href="{% url 'users:profile' %}" class="nav-link text-white">Профиль</a>
-                    </li>
-                    <li class="nav-item">
-                      <a href="{% url 'learn:favorites' %}" class="nav-link text-white">Избранное</a>
-                    </li>
-                    <li class="nav-item">
-                      <a href="{% url 'learn:student_courses' %}" class="nav-link text-white">Обучение</a>
-                    </li>
-                    <li class="nav-item">
-                      <a href="{% url 'users:user_logout' %}" class="nav-link text-white">Выход</a>
-                    </li>
-                  </ul>
-                </div>
-              {% endif %}
-            {% else %}
-              <a href="{% url 'courses:catalog' %}" class="navbar-brand text-white">Learning-Platform</a>
-              <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                  <li class="nav-item ms-auto">
-                    <a href="{% url 'users:user_login' %}" class="nav-link text-white">Вход</a>
+    <div class="header">
+      <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+          {% if user.is_authenticated %}
+            {% if user.is_author %}
+              <a href="{% url 'users:profile' %}" class="navbar-brand"><i class="fas fa-graduation-cap me-2"></i>Learning Platform</a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+              <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                  <li class="nav-item">
+                    <a href="{% url 'users:profile' %}" class="nav-link"><i class="fas fa-user me-1"></i> Профиль</a>
                   </li>
                   <li class="nav-item">
-                    <a href="{% url 'users:register_student' %}" class="nav-link text-white">Регистрация</a>
+                    <a href="{% url 'users:user_logout' %}" class="nav-link"><i class="fas fa-sign-out-alt me-1"></i> Выход</a>
+                  </li>
+                </ul>
+              </div>
+            {% else %}
+              <a href="{% url 'courses:catalog' %}" class="navbar-brand"><i class="fas fa-graduation-cap me-2"></i>Learning Platform</a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+              <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                  <li class="nav-item">
+                    <a href="{% url 'users:profile' %}" class="nav-link"><i class="fas fa-user me-1"></i> Профиль</a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{% url 'learn:favorites' %}" class="nav-link"><i class="fas fa-heart me-1"></i> Избранное</a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{% url 'learn:student_courses' %}" class="nav-link"><i class="fas fa-book-open me-1"></i> Мои курсы</a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{% url 'users:user_logout' %}" class="nav-link"><i class="fas fa-sign-out-alt me-1"></i> Выход</a>
                   </li>
                 </ul>
               </div>
             {% endif %}
-          </div>
-        </nav>
-      </header>
+          {% else %}
+            <a href="{% url 'courses:catalog' %}" class="navbar-brand"><i class="fas fa-graduation-cap me-2"></i>Learning Platform</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                  <a href="{% url 'users:user_login' %}" class="nav-link"><i class="fas fa-sign-in-alt me-1"></i> Вход</a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'users:register_student' %}" class="nav-link"><i class="fas fa-user-plus me-1"></i> Регистрация</a>
+                </li>
+              </ul>
+            </div>
+          {% endif %}
+        </div>
+      </nav>
     </div>
 
-    <div class="wrapper">
+    <div class="wrapper py-4">
       <div class="content">
         <div class="container">
           {% block content %}
@@ -76,25 +84,31 @@
           {% endblock %}
         </div>
       </div>
+    </div>
 
-      <div class="footer">
-        <div class="container">
-          <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
-            <p class="col-md-4 mb-0 text-white">© 2025 Learning-Platform, Inc</p>
-
-            <ul class="nav col-md-4 justify-content-end">
-              <li class="nav-item">
-                <a href="{% url 'courses:catalog' %}" class="nav-link px-2 text-white">Главная</a>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link px-2 text-white">About</a>
-              </li>
-            </ul>
-          </footer>
-        </div>
+    <div class="footer">
+      <div class="container">
+        <footer class="d-flex flex-wrap justify-content-between align-items-center py-3">
+          <p class="col-md-4 mb-0">© 2025 Learning Platform, Inc</p>
+          <ul class="nav col-md-4 justify-content-end">
+            <li class="nav-item">
+              <a href="{% url 'courses:catalog' %}" class="nav-link px-2 text-white">Главная</a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link px-2 text-white">О нас</a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link px-2 text-white">Контакты</a>
+            </li>
+          </ul>
+        </footer>
       </div>
     </div>
-    {% comment %}js for bootstrap{% endcomment %}
-    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- HTMX (for existing functionality) -->
+    <script src="https://unpkg.com/htmx.org@1.9.10/dist/htmx.min.js"></script>
   </body>
 </html>

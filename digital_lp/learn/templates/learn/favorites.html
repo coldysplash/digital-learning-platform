@@ -2,28 +2,62 @@
 {% load static %}
 
 {% block content %}
-  <h3>Моё избранное</h3>
-  {% if favorite_courses|length == 0 %}
-    <div class="text-center">
-      <h3 class="mt-5">Нет курсов в избранном</h3>
-      <a href="{% url 'courses:catalog' %}"><button type="button" class="btn btn-success btn-lg">Каталог</button></a>
-    </div>
-  {% else %}
-    <div class="course-list">
-      <div class="container-md">
-        <div class="row row-cols-3">
-          {% for item in favorite_courses %}
-            <div class="col-sm-6">
-              <div class="card">
-                <img src="{{ item.course.image.url }}" alt="{{ item.course.name }}" class="img-course img-thumbnail" />
-                <div class="card-body">
-                  <h4 class="card-title">Название: {{ item.course.name }}</h4>
-                </div>
-              </div>
-            </div>
-          {% endfor %}
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <h2 class="mb-0"><i class="fas fa-heart text-danger me-2"></i>Мое избранное</h2>
+            <a href="{% url 'courses:catalog' %}" class="btn btn-primary"><i class="fas fa-search me-1"></i>Просмотреть больше курсов</a>
+          </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  {% if favorite_courses|length == 0 %}
+    <div class="card shadow-sm">
+      <div class="card-body text-center py-5">
+        <i class="fas fa-heart fa-4x text-muted mb-3"></i>
+        <h3>Пока нет избранных курсов</h3>
+        <p class="text-muted mb-4">Добавляйте курсы в избранное, чтобы быстро получать к ним доступ позже.</p>
+        <a href="{% url 'courses:catalog' %}" class="btn btn-primary btn-lg"><i class="fas fa-search me-1"></i>Просмотреть курсы</a>
+      </div>
+    </div>
+  {% else %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      {% for item in favorite_courses %}
+        <div class="col">
+          <div class="card h-100">
+            <img src="{{ item.course.image.url }}" alt="{{ item.course.name }}" class="card-img-top img-course" />
+            <div class="card-body">
+              <h5 class="card-title">{{ item.course.name }}</h5>
+              <p class="card-text text-truncate">{{ item.course.description }}</p>
+              <div class="d-flex align-items-center">
+                <div class="avatar-sm me-2">
+                  {% if item.course.author.image %}
+                    <img src="{{ item.course.author.image.url }}" alt="{{ item.course.author.first_name }}" class="rounded-circle" width="32" height="32" />
+                  {% else %}
+                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                      <span class="text-white small">{{ item.course.author.name|first|upper }}</span>
+                    </div>
+                  {% endif %}
+                </div>
+                <span class="small text-muted">{{ item.course.author.name }}</span>
+              </div>
+            </div>
+            <div class="card-footer bg-white border-top-0">
+              <div class="d-flex justify-content-between align-items-center">
+                <form method="post" action="#" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-heart-broken me-1"></i>Удалить</button>
+                </form>
+                <a href="{% url 'courses:course_detail_view' item.course.id %}" class="btn btn-sm btn-primary"><i class="fas fa-eye me-1"></i>Просмотр курса</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
     </div>
   {% endif %}
 {% endblock %}

@@ -71,20 +71,33 @@ def user_logout(request):
 
 
 @login_required
-def profile(request):
+def profile(request, form=None):
     user = request.user
+    form = form or UserProfileForm(instance=user)
     if user.is_author:
-        form = UserProfileForm(instance=user)
         author_courses = Course.objects.filter(author=user)
         return render(
             request,
             "users/author_profile.html",
             {"form": form, "courses": author_courses},
         )
+    return render(
+        request,
+        "users/student_profile.html",
+        {"form": form},
+    )
+
+
+@login_required
+def edit_profile(request):
+    user = request.user
+    if request.method == "POST":
+        form = UserProfileForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect("user:profile")
+        return profile(request, form=form)
     else:
         form = UserProfileForm(instance=user)
-        return render(
-            request,
-            "users/student_profile.html",
-            {"form": form},
-        )
+
+    return render("user:edit_profile", "users/edit_profile.html", {"form": form})

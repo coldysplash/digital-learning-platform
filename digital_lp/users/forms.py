@@ -7,7 +7,10 @@ from .models import User
 class UserRegistrationForm(UserCreationForm):
     class Meta:
         model = User
-        fields = ("email", "password1", "password2")
+        fields = ("email", "name", "password1", "password2")
+        labels = {
+            "name": "Ваше имя",
+        }
 
     def clean_password1(self):
         password1 = self.cleaned_data.get("password1")
@@ -44,7 +47,7 @@ class UserProfileForm(forms.ModelForm):
         model = User
         fields = [
             "email",
-            "first_name",
-            "last_name",
+            "name",
             "image",
         ]
+        labels = {"name": "Ваше имя", "image": "Фото"}

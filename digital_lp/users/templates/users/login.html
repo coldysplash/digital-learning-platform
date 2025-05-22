@@ -3,36 +3,56 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-  <section class="vh-100">
-    <div class="container-fluid h-custom">
-      <div class="row d-flex justify-content-center align-items-center h-100">
-        <div class="col-md-9 col-lg-6 col-xl-5">
-          <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp" class="img-fluid" alt="Sample image" />
+<div class="row justify-content-center">
+  <div class="col-md-10 col-lg-8">
+    <div class="card shadow">
+      <div class="row g-0">
+        <div class="col-md-6 d-none d-md-block">
+          <img src="https://images.unsplash.com/photo-1501504905252-473c47e087f8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80" 
+               class="img-fluid rounded-start h-100 object-fit-cover" alt="Learning illustration">
         </div>
-        <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
-          <h2 class="mb-3">Вход</h2>
-          {% if messages %}
-            <div class="alert alert-success" role="alert">
-              {% for message in messages %}
-                {{ message }}
-              {% endfor %}
-            </div>
-          {% endif %}
-          <form method="post" class="loginform">
-            <!-- Email , Password input -->
-            <div data-mdb-input-init class="form-outline mb-4">
-              {% csrf_token %} {{ form|crispy }}
-            </div>
-
-            <div class="text-center text-lg-start mt-4 pt-2">
-              <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg" style="padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
-              <p class="small fw-bold mt-2 pt-1 mb-0">
-                Еще нет аккаунта? <a href="{% url 'users:register_student' %}" class="link-danger">Зарегестрироваться</a>
-              </p>
-            </div>
-          </form>
+        <div class="col-md-6">
+          <div class="card-body p-4 p-md-5">
+            <h2 class="card-title text-center mb-4">Добро пожаловать</h2>
+            
+            {% if messages %}
+              <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {% for message in messages %}
+                  {{ message }}
+                {% endfor %}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endif %}
+            
+            <form method="post" class="loginform">
+              {% csrf_token %}
+              
+              <div class="mb-3">
+                <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                {{ form.email|as_crispy_field }}
+              </div>
+              
+              <div class="mb-4">
+                <label for="{{ form.password.id_for_label }}" class="form-label">Пароль</label>
+                {{ form.password|as_crispy_field }}
+              </div>
+              
+              <div class="d-grid gap-2 mb-4">
+                <button type="submit" class="btn btn-primary btn-lg">
+                  <i class="fas fa-sign-in-alt me-2"></i>Войти
+                </button>
+              </div>
+              
+              <div class="text-center">
+                <p class="mb-0">Нет аккаунта? 
+                  <a href="{% url 'users:register_student' %}" class="text-primary fw-bold">Зарегистрироваться</a>
+                </p>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</div>
 {% endblock %}

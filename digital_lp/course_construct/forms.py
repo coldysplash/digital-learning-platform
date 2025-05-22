@@ -51,15 +51,24 @@ class TestForm(forms.ModelForm):
     class Meta:
         model = Test
         fields = ["title", "description", "passing_score"]
+        labels = {
+            "title": "Название теста",
+            "description": "Описание",
+            "passing_score": "Прохдной балл для теста (можно установаить позже)",
+        }
 
 
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Questions
         fields = ["question"]
+        labels = {
+            "question": "Вопрос",
+        }
 
 
 class AnswerForm(forms.ModelForm):
     class Meta:
         model = Answers
         fields = ["answer", "flag"]
+        labels = {"answer": "Ответ", "flag": "Правильный/Неправильный"}

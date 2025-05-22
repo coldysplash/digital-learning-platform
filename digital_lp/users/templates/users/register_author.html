@@ -1,1 +1,46 @@
-{% extends 'users/register_student.html' %}
+{% extends 'main/index.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-10 col-lg-8">
+    <div class="card shadow">
+      <div class="row g-0">
+        <div class="col-md-6 d-none d-md-block">
+          <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80" 
+               class="img-fluid rounded-start h-100 object-fit-cover" alt="Author registration illustration">
+        </div>
+        <div class="col-md-6">
+          <div class="card-body p-4 p-md-5">
+            <h2 class="card-title text-center mb-4">Создать аккаунт автора</h2>
+            
+            <form method="post" class="loginform">
+              {% csrf_token %}
+              
+              <div class="nav nav-pills nav-justified mb-4 change_role">
+                <a href="{% url 'users:register_student' %}" class="nav-link">Я студент</a>
+                <a href="{% url 'users:register_author' %}" class="nav-link active">Я автор</a>
+              </div>
+              
+              {{ form|crispy }}
+              
+              <div class="d-grid gap-2 mt-4 mb-3">
+                <button type="submit" class="btn btn-primary btn-lg">
+                  <i class="fas fa-user-plus me-2"></i>Зарегистрироваться как автор
+                </button>
+              </div>
+              
+              <div class="text-center">
+                <p class="mb-0">Уже есть аккаунт? 
+                  <a href="{% url 'users:user_login' %}" class="text-primary fw-bold">Войти</a>
+                </p>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
