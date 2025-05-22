@@ -1,0 +1,11 @@
+{% block content %}
+  <div class="container mt-5" id="main">
+    <h2>Удаление урока</h2>
+    <p>Вы уверены, что хотите удалить урок "{{ lesson.title }}" из модуля "{{ module.name }}"?</p>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Удалить</button>
+      <a hx-get="{% url 'construct:lesson' lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Отмена</a>
+    </form>
+  </div>
+{% endblock %}

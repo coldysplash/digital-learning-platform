@@ -1,0 +1,16 @@
+<div class="col-2 border" id="sidebar">
+  {% for module in module_list %}
+    <button hx-get="{% url 'construct:module' module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML">{{ module.order }}. {{ module.name }}</button><br />
+    {% for lesson in lessons %}
+      {% if lesson.module.id == module.id %}
+        <button hx-get="{% url 'construct:lesson' lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML">{{ lesson.order }}. {{ lesson.title }}</button><br />
+      {% endif %}
+    {% endfor %}
+    {% for test in tests %}
+      {% if test.module.id == module.id %}
+        <button hx-get="{% url 'construct:test_detail' test.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML">{{ test.order }}. {{ test.title }}</button><br />
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+  <button hx-get="{% url 'construct:module_create' course_id=course.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML"><div class="">Добавить модуль</div></button>
+</div>

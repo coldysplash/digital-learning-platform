@@ -1,0 +1,23 @@
+{% extends 'layouts/main.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <div class="row">
+    {% include 'construct/partials/sidenav.html' %}
+
+    <div class="col border">
+      {% csrf_token %}
+      {{ module.order }}<br />
+      {{ module.name }}<br />
+      {{ module.description }}<br />
+      {% for lesson in lessons %}
+        {{ lesson.order }}
+        {{ lesson.title }}<br />
+      {% endfor %}
+      <button hx-get="{% url 'construct:module_edit' module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Редактировать</button>
+      <a hx-get="{% url 'construct:module_delete' module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Удалить</a>
+      <button hx-get="{% url 'construct:lesson_create' module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Добавить урок</button>
+      <button hx-get="{% url 'construct:test_create' module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Добавить тест</button>
+    </div>
+  </div>
+{% endblock %}

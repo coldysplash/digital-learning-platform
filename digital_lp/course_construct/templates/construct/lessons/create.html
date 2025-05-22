@@ -1,0 +1,11 @@
+{% load crispy_forms_tags %}
+
+<div class="container mt-5">
+  <form method="post">
+    {% csrf_token %}
+    {{ form.title|as_crispy_field }}
+    {{ form.description|as_crispy_field }}
+    <button type="submit" class="btn btn-primary mt-3">Сохранить</button>
+    <a hx-get="{% url 'construct:module' module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Отмена</a>
+  </form>
+</div>

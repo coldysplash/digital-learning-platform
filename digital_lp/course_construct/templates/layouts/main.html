@@ -1,0 +1,71 @@
+{% load static %}
+{% if request.use_layout %}
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Constructor</title>
+
+    <script src="https://unpkg.com/htmx.org@1.9.10/dist/htmx.min.js"></script>
+
+    {% comment %}bootstrap{% endcomment %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.css' %}" />
+
+    {% comment %}css{% endcomment %}
+    <link rel="stylesheet" href="{% static 'css/index.css' %}" />
+  </head>
+  <body>
+    <div class="header mb-4">
+      <header>
+        <nav class="navbar navbar-expand-sm">
+          <div class="container border-bottom border-top py-2 my-3">
+            <h3>Редактирование курса</h3>
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+              <ul class="navbar-nav flex-grow-1">
+                <li class="nav-item ms-auto">
+                  <a href="{% url 'users:profile' %}" class="nav-link text-white">Профиль</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+    </div>
+
+
+    <div class="wrapper">
+{% endif %}
+  
+      <div class="content" id="main">
+        {% block content %}
+
+        {% endblock %}
+      </div>
+{% if request.use_layout %}
+
+      <div class="footer">
+        <div class="container">
+          <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+            <p class="col-md-4 mb-0 text-white">© 2025 Learning-Platform, Inc</p>
+
+            <ul class="nav col-md-4 justify-content-end">
+              <li class="nav-item">
+                <a href="{% url 'courses:catalog' %}" class="nav-link px-2 text-white">Главная</a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link px-2 text-white">About</a>
+              </li>
+            </ul>
+          </footer>
+        </div>
+      </div>
+    </div>
+{% endif %}
+
+    {% comment %}js for bootstrap{% endcomment %}
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  </body>
+</html>
+
+

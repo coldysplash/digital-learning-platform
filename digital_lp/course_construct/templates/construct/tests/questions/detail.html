@@ -1,0 +1,23 @@
+<div class="container mt-5">
+  {% csrf_token %}
+  {{ question.order }}
+  {{ question.question }}
+  <button hx-get="{% url 'construct:question_edit' pk=question.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Редактировать</button>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Удалить</button>
+  </form>
+  <br />
+
+  ответы{% for answ in answers %}
+    <ul>
+      <li>{{ answ.answer }}</li>
+      <button hx-get="{% url 'construct:answer_edit' pk=answ.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Редактировать</button>
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Удалить</button>
+      </form>
+    </ul>
+  {% endfor %}
+  <button hx-get="{% url 'construct:answer_create' question_id=question.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Добавить ответ</button>
+</div>

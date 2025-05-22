@@ -1,34 +1,17 @@
-{% extends 'constructor/index.html' %}
-{% load static %}
+{% extends 'layouts/main.html' %}
 
 {% block content %}
   <div class="row">
-    <div class="col-2 border">
-      {% for module in module_list %}
-        <button hx-get="{% url 'construct:module' module.id %}" hx-target="#modal" hx-swap="outerHTML">{{ module.order }}. {{ module.name }}</button><br />
-        {% for lesson in lessons %}
-          {% if lesson.module.id == module.id %}
-            <button hx-get="{% url 'construct:lesson' lesson.id %}" hx-target="#modal" hx-swap="outerHTML">{{ lesson.order }}. {{ lesson.title }}</button><br />
-          {% endif %}
-        {% endfor %}
-        {% for test in tests %}
-          {% if test.module.id == module.id %}
-            <button hx-get="{% url 'construct:test_detail' test.id %}" hx-target="#modal" hx-swap="outerHTML">{{ test.order }}. {{ test.title }}</button><br />
-          {% endif %}
-        {% endfor %}
-      {% endfor %}
-      <button hx-get="{% url 'construct:module_create' course_id=course.id %}" hx-target="#modal" hx-swap="outerHTML"><div class="">Добавить модуль</div></button>
-    </div>
+    {% include 'construct/partials/sidenav.html' %}
+
     <div class="col border">
-      <div id="modal" style="display: block;">
-        {% if messages %}
-          <div class="messages">
-            {% for message in messages %}
-              <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-          </div>
-        {% endif %}
-      </div>
+      {% if messages %}
+        <div class="messages">
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
     </div>
   </div>
 {% endblock %}

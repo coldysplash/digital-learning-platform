@@ -1,0 +1,20 @@
+{% extends 'layouts/main.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <div class="row">
+    {% include 'construct/partials/sidenav.html' %}
+
+    <div class="col border" id="main">
+      <div class="container mt-5">
+        <form method="post">
+          {% csrf_token %}
+          {{ form.name|as_crispy_field }}
+          {{ form.description|as_crispy_field }}
+          <button type="submit" class="btn btn-primary mt-3">Сохранить изменения</button>
+          <a hx-get="{% url 'construct:main' course.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Отмена</a>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

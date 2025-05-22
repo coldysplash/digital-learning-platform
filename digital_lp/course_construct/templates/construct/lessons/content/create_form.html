@@ -1,7 +1,7 @@
 {% extends 'construct/main.html' %}
 {% block content %}
   <h1>Добавить контент</h1>
-  <form method="post" enctype="multipart/form-data">
+  <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit" class="btn btn-success">Сохранить</button>

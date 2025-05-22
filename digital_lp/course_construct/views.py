@@ -20,7 +20,21 @@ from .utils import (
 )
 from .models import *
 from .forms import *
-from users.views import author_required
+
+
+def get_sidebar_context(course_id):
+    course = get_object_or_404(Course, id=course_id)
+    context = {
+        "course": course,
+        "module_list": Module.objects.filter(course=course).select_related("course"),
+        "lessons": Lesson.objects.filter(module__course=course)
+        .order_by("module__order", "order")
+        .select_related("module"),
+        "tests": Test.objects.filter(module__course=course)
+        .order_by("module__order", "order")
+        .select_related("module"),
+    }
+    return context
 
 
 class ConstructorCourseView(LoginRequiredMixin, AuthorRequiredMixin, ListView):
@@ -29,41 +43,26 @@ class ConstructorCourseView(LoginRequiredMixin, AuthorRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        course = get_object_or_404(Course, id=self.kwargs["course_id"])
-        context["course"] = course
-        context["module_list"] = Module.objects.filter(course=course).select_related(
-            "course"
-        )
-        context["lessons"] = (
-            Lesson.objects.filter(module__course=course)
-            .order_by("module__order", "order")
-            .select_related("module")
-        )
-        context["tests"] = (
-            Test.objects.filter(module__course=course)
-            .order_by("module__order", "order")
-            .select_related("module")
-        )
-
+        context = get_sidebar_context(self.kwargs["course_id"])
         return context
 
 
 # Module CRUD
 class ModuleDetailView(LoginRequiredMixin, AuthorRequiredMixin, DetailView):
     model = Module
-    template_name = "modules/module.html"
+    template_name = "construct/modules/module.html"
     context_object_name = "module"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["lessons"] = self.object.lesson_set.all()
+        context.update(get_sidebar_context(self.object.course.id))
         return context
 
 
 class ModuleCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView):
     model = Module
     form_class = ModuleForm
-    template_name = "modules/create.html"
+    template_name = "construct/modules/create.html"
 
     def form_valid(self, form):
         course = get_object_or_404(Course, id=self.kwargs["course_id"])
@@ -80,29 +79,25 @@ class ModuleCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["course"] = get_object_or_404(Course, id=self.kwargs["course_id"])
+        context.update(get_sidebar_context(self.kwargs["course_id"]))
         return context
 
 
 class ModuleUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
     model = Module
     form_class = ModuleForm
-    template_name = "modules/form.html"
+    template_name = "construct/modules/form.html"
 
     def get_success_url(self):
-        return reverse_lazy(
-            "construct:main", kwargs={"course_id": self.object.course.id}
-        )
+        return reverse_lazy("construct:module", kwargs={"pk": self.object.id})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["course"] = self.object.course
         context["module"] = self.object
         return context
 
 
 @login_required
-@author_required
 def module_delete(request, pk):
     module = get_object_or_404(Module, id=pk)
     course = module.course
@@ -112,7 +107,7 @@ def module_delete(request, pk):
 
     return render(
         request,
-        "modules/delete.html",
+        "construct/modules/delete.html",
         {"module": module, "course": course},
     )
 
@@ -121,7 +116,7 @@ def module_delete(request, pk):
 class LessonCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView):
     model = Lesson
     form_class = LessonForm
-    template_name = "lessons/create.html"
+    template_name = "construct/lessons/create.html"
 
     def form_valid(self, form):
         module = get_object_or_404(Module, id=self.kwargs["module_id"])
@@ -141,26 +136,27 @@ class LessonCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView):
 
 class LessonDetailView(LoginRequiredMixin, AuthorRequiredMixin, DetailView):
     model = Lesson
-    template_name = "lessons/lesson.html"
+    template_name = "construct/lessons/lesson.html"
     context_object_name = "lesson"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         context["contents"] = self.object.contents.all()
+        context.update(get_sidebar_context(self.object.module.course.id))
         return context
 
 
 class LessonUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
     model = Lesson
     form_class = LessonForm
-    template_name = "lessons/form.html"
+    template_name = "construct/lessons/form.html"
 
     def get_success_url(self):
         return reverse_lazy("construct:lesson", kwargs={"pk": self.object.pk})
 
 
 @login_required
-@author_required
 def lesson_delete(request, pk):
     lesson = get_object_or_404(Lesson, id=pk)
     module = lesson.module
@@ -171,14 +167,14 @@ def lesson_delete(request, pk):
 
     return render(
         request,
-        "lessons/delete.html",
+        "construct/lessons/delete.html",
         {"lesson": lesson, "module": module},
     )
 
 
 # Базовое представление для создания контента
 class BaseContentCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView):
-    template_name = "lessons/content/create_form.html"
+    template_name = "construct/lessons/content/create_form.html"
 
     def form_valid(self, form):
         content_object = form.save()
@@ -217,7 +213,7 @@ class ImageContentCreateView(BaseContentCreateView):
 
 # Представление для редактирования контента
 class ContentUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
-    template_name = "lessons/content/edit_form.html"
+    template_name = "construct/lessons/content/edit_form.html"
 
     def get_object(self):
         lesson_content = LessonContent.objects.get(id=self.kwargs["pk"])
@@ -244,7 +240,7 @@ class ContentUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
 # Представление для удаления контента
 class ContentDeleteView(LoginRequiredMixin, AuthorRequiredMixin, DeleteView):
     model = LessonContent
-    template_name = "lessons/content/confirm_delete.html"
+    template_name = "construct/lessons/content/confirm_delete.html"
 
     def post(self, request, *args, **kwargs):
         lesson_content = self.get_object()
@@ -269,7 +265,7 @@ class ContentDeleteView(LoginRequiredMixin, AuthorRequiredMixin, DeleteView):
 class TestCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView):
     model = Test
     form_class = TestForm
-    template_name = "tests/create.html"
+    template_name = "construct/tests/create.html"
 
     def form_valid(self, form):
         module = get_object_or_404(Module, id=self.kwargs["module_id"])
@@ -289,7 +285,7 @@ class TestCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView):
 
 class TestDetailView(LoginRequiredMixin, AuthorRequiredMixin, DetailView):
     model = Test
-    template_name = "tests/test_detail.html"
+    template_name = "construct/tests/test_detail.html"
     context_object_name = "test"
 
     def get_context_data(self, **kwargs):
@@ -303,14 +299,13 @@ class TestDetailView(LoginRequiredMixin, AuthorRequiredMixin, DetailView):
 class TestUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
     model = Test
     form_class = TestForm
-    template_name = "tests/form.html"
+    template_name = "construct/tests/form.html"
 
     def get_success_url(self):
         return reverse_lazy("construct:test_detail", kwargs={"pk": self.object.pk})
 
 
 @login_required
-@author_required
 def test_delete(request, pk):
     test = get_object_or_404(Test, id=pk)
     module = test.module
@@ -320,7 +315,7 @@ def test_delete(request, pk):
 
     return render(
         request,
-        "tests/confirm_delete.html",
+        "construct/tests/confirm_delete.html",
         {"test": test, "module": module},
     )
 
@@ -329,7 +324,7 @@ def test_delete(request, pk):
 class QuestionCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView):
     model = Questions
     form_class = QuestionForm
-    template_name = "tests/questions/create.html"
+    template_name = "construct/tests/questions/create.html"
 
     def form_valid(self, form):
         test = get_object_or_404(Test, id=self.kwargs["test_id"])
@@ -351,7 +346,7 @@ class QuestionCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView):
 
 class QuestionDetailView(LoginRequiredMixin, AuthorRequiredMixin, DetailView):
     model = Questions
-    template_name = "tests/questions/detail.html"
+    template_name = "construct/tests/questions/detail.html"
     context_object_name = "question"
 
     def get_context_data(self, **kwargs):
@@ -364,7 +359,7 @@ class QuestionDetailView(LoginRequiredMixin, AuthorRequiredMixin, DetailView):
 class QuestionUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
     model = Questions
     form_class = QuestionForm
-    template_name = "tests/questions/form.html"
+    template_name = "construct/tests/questions/form.html"
 
     def get_success_url(self):
         return reverse_lazy("construct:test_detail", kwargs={"pk": self.kwargs["pk"]})
@@ -377,7 +372,6 @@ class QuestionUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
 
 
 @login_required
-@author_required
 def question_delete(request, pk):
     question = get_object_or_404(Questions, id=pk)
     if request.method == "POST":
@@ -388,7 +382,7 @@ def question_delete(request, pk):
 class AnswerCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView):
     model = Answers
     form_class = AnswerForm
-    template_name = "tests/answers/create.html"
+    template_name = "construct/tests/answers/create.html"
 
     def form_valid(self, form):
         form.instance.question = get_object_or_404(
@@ -413,7 +407,7 @@ class AnswerCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView):
 class AnswerUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
     model = Answers
     form_class = AnswerForm
-    template_name = "tests/answers/form.html"
+    template_name = "construct/tests/answers/form.html"
     context_object_name = "answer"
 
     def get_success_url(self):

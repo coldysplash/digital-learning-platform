@@ -1,0 +1,35 @@
+{% extends 'layouts/main.html' %}
+
+{% block content %}
+  <div class="row">
+    {% include 'construct/partials/sidenav.html' %}
+
+    <div class="col border">
+      <div class="container mt-5">
+        {% csrf_token %}
+        {{ lesson.order }}
+        {{ lesson.title }}
+        {{ lesson.description }}
+        <button hx-get="{% url 'construct:lesson_edit' lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Редактировать</button>
+        <a hx-get="{% url 'construct:lesson_delete' lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Удалить</a>
+        <br />
+        <h3>Content</h3>
+        <ul>
+          {% for content in contents %}
+            <li>{{ content.content_type.model }}</li>
+            <a hx-get="{% url 'construct:content_edit' lesson_id=lesson.id pk=content.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary">Редактировать контент</a>
+            <a hx-get="{% url 'construct:content_delete' lesson_id=lesson.id pk=content.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary">Удалить контент</a>
+          {% endfor %}
+        </ul>
+
+        <h3>Добавить новый контент</h3>
+        <div class="button-group">
+          <a hx-get="{% url 'construct:add_text' lesson_id=lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-primary">Добавить текст</a>
+          <a hx-get="{% url 'construct:add_file' lesson_id=lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-primary">Добавить файл</a>
+          <a hx-get="{% url 'construct:add_link' lesson_id=lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-primary">Добавить ссылку</a>
+          <a hx-get="{% url 'construct:add_image' lesson_id=lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-primary">Добавить изображение</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
