@@ -2,73 +2,72 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="row">
-  {% include 'learn/partials/sidenav.html' %}
+  <div class="row">
+    {% include 'learn/partials/sidenav.html' %}
 
-  <div class="col-lg-9" id="main">
-    <div class="card shadow-sm">
-      <div class="card-body p-4">
-        <nav aria-label="breadcrumb" class="mb-4">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'learn:start' test.module.course.id %}">Главная страница курса</a></li>
-            <li class="breadcrumb-item"><a hx-get="{% url 'learn:module' test.module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML">Модуль {{ test.module.order }}</a></li>
-            <li class="breadcrumb-item active">Тест {{ test.order }}</li>
-          </ol>
-        </nav>
-        
-        <h2 class="mb-4">{{ test.title }}</h2>
-        
-        <div class="bg-light p-4 rounded mb-4">
-          <h5 class="mb-3">Обзор теста</h5>
-          <p>{{ test.description }}</p>
-          
-          <div class="d-flex flex-wrap gap-4 mt-4">
-            <div class="test-info">
-              <span class="text-muted">Вопросы:</span>
-              <span class="fw-bold">{{ questions|length }}</span>
-            </div>
-            <div class="test-info">
-              <span class="text-muted">Проходной балл:</span>
-              <span class="fw-bold">{{ test.passing_score }}%</span>
-            </div>
-            <div class="test-info">
-              <span class="text-muted">Ограничение по времени:</span>
-              <span class="fw-bold">Без ограничений</span>
-            </div>
-            <div class="test-info">
-              <span class="text-muted">Попытки:</span>
-              <span class="fw-bold">Неограниченно</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="text-center py-4">
-          <h5 class="mb-4">Готовы проверить свои знания?</h5>
-          <a href="#" class="btn btn-primary btn-lg">
-            <i class="fas fa-play-circle me-2"></i>Начать тест
-          </a>
-        </div>
-        
-        <div class="alert alert-info mt-4">
-          <div class="d-flex">
-            <div class="flex-shrink-0">
-              <i class="fas fa-info-circle fa-2x me-3"></i>
-            </div>
-            <div>
-              <h5 class="alert-heading">Инструкции к тесту</h5>
-              <p class="mb-0">Ответьте на все вопросы наилучшим образом. Вы можете просмотреть свои ответы перед отправкой. После завершения теста вы сразу получите свой результат.</p>
+    <div class="col-lg-9">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item">
+                <a href="{% url 'learn:start' test.module.course.id %}">Главная страница курса</a>
+              </li>
+              <li class="breadcrumb-item">
+                <a hx-get="{% url 'learn:module' test.module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML">Модуль {{ test.module.order }}</a>
+              </li>
+              <li class="breadcrumb-item active">Тест {{ test.order }}</li>
+            </ol>
+          </nav>
+
+          <h2 class="mb-4">{{ test.title }}</h2>
+
+          <div class="bg-light p-4 rounded mb-4">
+            <h5 class="mb-3">Обзор теста</h5>
+            <p>{{ test.description }}</p>
+
+            <div class="d-flex flex-wrap gap-4 mt-4">
+              <div class="test-info">
+                <span class="text-muted">Вопросы:</span>
+                <span class="fw-bold">{{ questions|length }}</span>
+              </div>
+              <div class="test-info">
+                <span class="text-muted">Проходной балл:</span>
+                <span class="fw-bold">{{ test.passing_score }}%</span>
+              </div>
+              <div class="test-info">
+                <span class="text-muted">Ограничение по времени:</span>
+                <span class="fw-bold">Без ограничений</span>
+              </div>
+              <div class="test-info">
+                <span class="text-muted">Попытки:</span>
+                <span class="fw-bold">Неограниченно</span>
+              </div>
             </div>
           </div>
-        </div>
-        
-        <div class="d-flex justify-content-between mt-4">
-          <button hx-get="{% url 'learn:module' test.module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" 
-                  class="btn btn-outline-primary">
-            <i class="fas fa-arrow-left me-1"></i>Вернуться к модулю
-          </button>
+
+          <div class="text-center py-4">
+            <h5 class="mb-4">Готовы проверить свои знания?</h5>
+            <a href="#" class="btn btn-primary btn-lg"><i class="fas fa-play-circle me-2"></i>Начать тест</a>
+          </div>
+
+          <div class="alert alert-info mt-4">
+            <div class="d-flex">
+              <div class="flex-shrink-0">
+                <i class="fas fa-info-circle fa-2x me-3"></i>
+              </div>
+              <div>
+                <h5 class="alert-heading">Инструкции к тесту</h5>
+                <p class="mb-0">Ответьте на все вопросы наилучшим образом. Вы можете просмотреть свои ответы перед отправкой. После завершения теста вы сразу получите свой результат.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between mt-4">
+            <button hx-get="{% url 'learn:module' test.module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-outline-primary"><i class="fas fa-arrow-left me-1"></i>Вернуться к модулю</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 {% endblock %}

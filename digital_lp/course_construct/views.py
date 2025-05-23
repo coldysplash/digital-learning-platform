@@ -20,6 +20,7 @@ from .utils import (
 )
 from .models import *
 from .forms import *
+from learn.models import CourseProgress
 
 
 def get_sidebar_context(course_id):
@@ -43,7 +44,9 @@ class ConstructorCourseView(LoginRequiredMixin, AuthorRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context = get_sidebar_context(self.kwargs["course_id"])
+        course = get_object_or_404(Course, id=self.kwargs["course_id"])
+        context["students_count"] = CourseProgress.objects.filter(course=course).count()
+        context.update(get_sidebar_context(course.id))
         return context
 
 
@@ -79,7 +82,7 @@ class ModuleCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(get_sidebar_context(self.kwargs["course_id"]))
+        context["course"] = get_object_or_404(Course, id=self.kwargs["course_id"])
         return context
 
 
@@ -293,6 +296,7 @@ class TestDetailView(LoginRequiredMixin, AuthorRequiredMixin, DetailView):
         context["questions"] = Questions.objects.filter(test=self.object).order_by(
             "order"
         )
+        context.update(get_sidebar_context(self.object.module.course.id))
         return context
 
 

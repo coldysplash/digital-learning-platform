@@ -1,16 +1,67 @@
-<div class="col-2 border" id="sidebar">
-  {% for module in module_list %}
-    <button hx-get="{% url 'construct:module' module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML">{{ module.order }}. {{ module.name }}</button><br />
-    {% for lesson in lessons %}
-      {% if lesson.module.id == module.id %}
-        <button hx-get="{% url 'construct:lesson' lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML">{{ lesson.order }}. {{ lesson.title }}</button><br />
+<div class="col-lg-3">
+  <div id="sidebar">
+    <div class="d-flex align-items-center mb-4">
+      <div class="flex-shrink-0">
+        {% if course.image %}
+          <img src="{{ course.image.url }}" alt="{{ course.name }}" class="rounded" width="60" height="60" style="object-fit: cover;" />
+        {% else %}
+          <div class="rounded bg-primary d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+            <span class="text-white h5 mb-0">{{ course.name|first|upper }}</span>
+          </div>
+        {% endif %}
+      </div>
+      <div class="flex-grow-1 ms-3">
+        <h6 class="mb-0">{{ course.name }}</h6>
+        <p class="text-muted small mb-0">{{ course.author.name }}</p>
+      </div>
+    </div>
+
+    <!-- Структура курса -->
+    <div class="sidebar-section">
+      <h6 class="sidebar-section-title"><i class="fas fa-sitemap me-1"></i>Структура курса</h6>
+
+      {% for module in module_list %}
+        <div class="module-section mb-3">
+          <!-- Заголовок модуля -->
+          <button hx-get="{% url 'construct:module' module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="sidebar-item module-item {% if module.id == current_module.id %}active{% endif %}"><i class="fas fa-folder"></i>{{ module.order }}. {{ module.name }}</button>
+
+          <!-- Содержимое модуля -->
+          <div class="module-content ms-3">
+            <!-- Уроки модуля -->
+            {% for lesson in lessons %}
+              {% if lesson.module.id == module.id %}
+                <button hx-get="{% url 'construct:lesson' lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="sidebar-item lesson-item {% if lesson.id == current_lesson.id %}active{% endif %}"><i class="fas fa-book text-success"></i>{{ lesson.order }}. {{ lesson.title }}</button>
+              {% endif %}
+            {% endfor %}
+
+            <!-- Тесты модуля -->
+            {% for test in tests %}
+              {% if test.module.id == module.id %}
+                <button hx-get="{% url 'construct:test_detail' test.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="sidebar-item test-item {% if test.id == current_test.id %}active{% endif %}"><i class="fas fa-tasks text-info"></i>{{ test.order }}. {{ test.title }}</button>
+              {% endif %}
+            {% endfor %}
+
+            <!-- Кнопки добавления для текущего модуля -->
+            {% if module.id == current_module.id %}
+              <div class="add-buttons mt-2">
+                <button hx-get="{% url 'construct:lesson_create' module_id=module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="sidebar-add-button-small"><i class="fas fa-plus me-1"></i>Урок</button>
+                <button hx-get="{% url 'construct:test_create' module_id=module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="sidebar-add-button-small"><i class="fas fa-plus me-1"></i>Тест</button>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+
+      <!-- Кнопка добавления модуля -->
+      {% if course %}
+        <button hx-get="{% url 'construct:module_create' course_id=course.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="sidebar-add-button"><i class="fas fa-plus"></i> Добавить модуль</button>
+      {% elif current_module %}
+        <button hx-get="{% url 'construct:module_create' course_id=current_module.course.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="sidebar-add-button"><i class="fas fa-plus"></i> Добавить модуль</button>
+      {% elif current_lesson %}
+        <button hx-get="{% url 'construct:module_create' course_id=current_lesson.module.course.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="sidebar-add-button"><i class="fas fa-plus"></i> Добавить модуль</button>
+      {% elif current_test %}
+        <button hx-get="{% url 'construct:module_create' course_id=current_test.module.course.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="sidebar-add-button"><i class="fas fa-plus"></i> Добавить модуль</button>
       {% endif %}
-    {% endfor %}
-    {% for test in tests %}
-      {% if test.module.id == module.id %}
-        <button hx-get="{% url 'construct:test_detail' test.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML">{{ test.order }}. {{ test.title }}</button><br />
-      {% endif %}
-    {% endfor %}
-  {% endfor %}
-  <button hx-get="{% url 'construct:module_create' course_id=course.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML"><div class="">Добавить модуль</div></button>
+    </div>
+  </div>
 </div>

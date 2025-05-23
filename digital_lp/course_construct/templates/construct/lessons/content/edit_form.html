@@ -1,9 +1,69 @@
-{% extends 'construct/main.html' %}
+{% extends 'layouts/main.html' %}
+{% load crispy_forms_tags %}
+
 {% block content %}
-  <h1>Редактировать контент</h1>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-success">Сохранить</button>
-  </form>
+  <div class="content-card">
+    <div class="content-header">
+      <h4 class="content-title">
+        {% if form.text %}
+          Редактирование текстового контента
+        {% elif form.image %}
+          Редактирование изображения
+        {% elif form.file %}
+          Редактирование файла
+        {% elif form.url %}
+          Редактирование ссылки
+        {% endif %}
+      </h4>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      {% if form.text %}
+        <div class="mb-4">
+          <label for="{{ form.text.id_for_label }}" class="form-label">Текстовое содержимое</label>
+          {{ form.text|as_crispy_field }}
+          <div class="form-text">Введите текст, который будет отображаться в уроке. Поддерживается форматирование текста.</div>
+        </div>
+      {% elif form.image %}
+        <div class="mb-4">
+          <label for="{{ form.image.id_for_label }}" class="form-label">Изображение</label>
+          {{ form.image|as_crispy_field }}
+          <div class="form-text">Загрузите изображение в формате JPG, PNG или GIF. Максимальный размер файла: 5MB.</div>
+
+          {% if form.instance.image %}
+            <div class="mt-3">
+              <p class="mb-2">Текущее изображение:</p>
+              <img src="{{ form.instance.image.url }}" alt="Текущее изображение" class="img-thumbnail" style="max-height: 200px;" />
+            </div>
+          {% endif %}
+        </div>
+      {% elif form.file %}
+        <div class="mb-4">
+          <label for="{{ form.file.id_for_label }}" class="form-label">Файл</label>
+          {{ form.file|as_crispy_field }}
+          <div class="form-text">Загрузите файл, который будет доступен для скачивания студентам. Максимальный размер файла: 10MB.</div>
+
+          {% if form.instance.file %}
+            <div class="mt-3">
+              <p class="mb-2">Текущий файл: {{ form.instance.file.name|split:'/'|last }}</p>
+              <a href="{{ form.instance.file.url }}" class="btn btn-sm btn-outline-primary" download><i class="fas fa-download me-1"></i>Скачать текущий файл</a>
+            </div>
+          {% endif %}
+        </div>
+      {% elif form.url %}
+        <div class="mb-4">
+          <label for="{{ form.url.id_for_label }}" class="form-label">URL-адрес</label>
+          {{ form.url|as_crispy_field }}
+          <div class="form-text">Введите полный URL-адрес внешнего ресурса, включая http:// или https://.</div>
+        </div>
+      {% endif %}
+
+      <div class="d-flex justify-content-between">
+        <button hx-get="{% url 'construct:lesson' lesson_id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-outline-secondary"><i class="fas fa-times me-1"></i>Отмена</button>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Сохранить изменения</button>
+      </div>
+    </form>
+  </div>
 {% endblock %}

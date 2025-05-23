@@ -114,16 +114,17 @@
         </div>
       </div>
     </div>
-{% endif %}
   
     <div class="course-content py-4">
-      <div class="container">
+{% endif %}
+
+      <div class="container" id="main">
         {% block content %}
         {% endblock %}
       </div>
+{% if request.use_layout %}
     </div>
     
-{% if request.use_layout %}
     <div class="footer">
       <div class="container">
         <footer class="d-flex flex-wrap justify-content-between align-items-center py-3">

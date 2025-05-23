@@ -1,11 +1,26 @@
+{% extends 'layouts/main.html' %}
 {% load crispy_forms_tags %}
 
-<div class="container mt-5">
-  <form method="post">
-    {% csrf_token %}
-    {{ form.title|as_crispy_field }}
-    {{ form.description|as_crispy_field }}
-    <button type="submit" class="btn btn-primary mt-3">Сохранить</button>
-    <a hx-get="{% url 'construct:module' module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Отмена</a>
-  </form>
-</div>
+{% block content %}
+  <div class="content-card">
+    <div class="content-header">
+      <h4 class="content-title">Создание нового урока</h4>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="mb-3">{{ form.title|as_crispy_field }}</div>
+
+      <div class="mb-4">
+        {{ form.description|as_crispy_field }}
+        <div class="form-text">Опишите, что студенты изучат в этом уроке.</div>
+      </div>
+
+      <div class="d-flex justify-content-between">
+        <button hx-get="{% url 'construct:module' module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-outline-secondary"><i class="fas fa-times me-1"></i>Отмена</button>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Сохранить урок</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

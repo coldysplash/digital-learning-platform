@@ -4,14 +4,141 @@
   <div class="row">
     {% include 'construct/partials/sidenav.html' %}
 
-    <div class="col border">
-      {% if messages %}
-        <div class="messages">
-          {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-          {% endfor %}
+    <div class="col-lg-9">
+      <div class="content-card">
+        <div class="content-header">
+          <h4 class="content-title">Обзор курса</h4>
         </div>
-      {% endif %}
+
+        {% if messages %}
+          <div class="messages mb-4">
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-body">
+                <h5 class="card-title">Информация о курсе</h5>
+                <div class="mt-3">
+                  <p>
+                    <strong>Название:</strong> {{ course.name }}
+                  </p>
+                  <p>
+                    <strong>Категория:</strong> {{ course.category.name }}
+                  </p>
+                  <p>
+                    <strong>Статус:</strong>
+                    <span class="badge {% if course.available %}
+                        
+                  
+                        bg-success
+
+                      {% else %}
+                        
+                
+                        bg-secondary
+
+                      {% endif %}">
+                      {% if course.available %}
+                        Опубликован
+                      {% else %}
+                        Черновик
+                      {% endif %}
+                    </span>
+                  </p>
+                  <p>
+                    <strong>Проверка:</strong>
+                    <span class="badge {% if course.verified %}
+                        
+                        bg-info
+
+                      {% else %}
+                        
+                        bg-warning
+
+                      {% endif %}">
+                      {% if course.verified %}
+                        Проверен
+                      {% else %}
+                        Ожидает проверки
+                      {% endif %}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-body">
+                <h5 class="card-title">Статистика курса</h5>
+                <div class="row mt-3">
+                  <div class="col-6 mb-3">
+                    <div class="d-flex align-items-center">
+                      <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                        <i class="fas fa-folder text-primary"></i>
+                      </div>
+                      <div>
+                        <h6 class="mb-0">{{ module_list|length }}</h6>
+                        <p class="text-muted mb-0">Модулей</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6 mb-3">
+                    <div class="d-flex align-items-center">
+                      <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                        <i class="fas fa-book text-success"></i>
+                      </div>
+                      <div>
+                        <h6 class="mb-0">{{ lessons|length }}</h6>
+                        <p class="text-muted mb-0">Уроков</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="d-flex align-items-center">
+                      <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
+                        <i class="fas fa-tasks text-info"></i>
+                      </div>
+                      <div>
+                        <h6 class="mb-0">{{ tests|length }}</h6>
+                        <p class="text-muted mb-0">Тестов</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="d-flex align-items-center">
+                      <div class="rounded-circle bg-warning bg-opacity-10 p-3 me-3">
+                        <i class="fas fa-users text-warning"></i>
+                      </div>
+                      <div>
+                        <h6 class="mb-0">{{ students_count }}</h6>
+                        <p class="text-muted mb-0">Студентов</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% if module_list|length == 0 %}
+          <div class="text-center py-5">
+            <i class="fas fa-folder-open fa-4x text-muted mb-3"></i>
+            <h4>Курс пока пуст</h4>
+            <p class="text-muted">Начните создавать структуру курса, добавив первый модуль.</p>
+            <button hx-get="{% url 'construct:module_create' course_id=course.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-primary mt-2"><i class="fas fa-plus me-1"></i>Добавить первый модуль</button>
+          </div>
+        {% endif %}
+      </div>
     </div>
   </div>
 {% endblock %}

@@ -1,9 +1,55 @@
-{% extends 'construct/main.html' %}
+{% extends 'layouts/main.html' %}
+{% load crispy_forms_tags %}
+
 {% block content %}
-  <h1>Добавить контент</h1>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-success">Сохранить</button>
-  </form>
+  <div class="content-card">
+    <div class="content-header">
+      <h4 class="content-title">
+        {% if 'text' in request.path %}
+          Добавление текстового контента
+        {% elif 'image' in request.path %}
+          Добавление изображения
+        {% elif 'file' in request.path %}
+          Добавление файла
+        {% elif 'link' in request.path %}
+          Добавление ссылки
+        {% endif %}
+      </h4>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      {% if 'text' in request.path %}
+        <div class="mb-4">
+          <label for="{{ form.text.id_for_label }}" class="form-label">Текстовое содержимое</label>
+          {{ form.text|as_crispy_field }}
+          <div class="form-text">Введите текст, который будет отображаться в уроке. Поддерживается форматирование текста.</div>
+        </div>
+      {% elif 'image' in request.path %}
+        <div class="mb-4">
+          <label for="{{ form.image.id_for_label }}" class="form-label">Изображение</label>
+          {{ form.image|as_crispy_field }}
+          <div class="form-text">Загрузите изображение в формате JPG, PNG или GIF. Максимальный размер файла: 5MB.</div>
+        </div>
+      {% elif 'file' in request.path %}
+        <div class="mb-4">
+          <label for="{{ form.file.id_for_label }}" class="form-label">Файл</label>
+          {{ form.file|as_crispy_field }}
+          <div class="form-text">Загрузите файл, который будет доступен для скачивания студентам. Максимальный размер файла: 10MB.</div>
+        </div>
+      {% elif 'link' in request.path %}
+        <div class="mb-4">
+          <label for="{{ form.url.id_for_label }}" class="form-label">URL-адрес</label>
+          {{ form.url|as_crispy_field }}
+          <div class="form-text">Введите полный URL-адрес внешнего ресурса, включая http:// или https://.</div>
+        </div>
+      {% endif %}
+
+      <div class="d-flex justify-content-between">
+        <button hx-get="{% url 'construct:lesson' lesson_id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-outline-secondary"><i class="fas fa-times me-1"></i>Отмена</button>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Сохранить</button>
+      </div>
+    </form>
+  </div>
 {% endblock %}

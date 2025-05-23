@@ -1,11 +1,29 @@
+{% extends 'layouts/main.html' %}
+
 {% block content %}
-  <div class="container mt-5" id="main">
-    <h2>Удаление урока</h2>
-    <p>Вы уверены, что хотите удалить урок "{{ lesson.title }}" из модуля "{{ module.name }}"?</p>
+  <div class="content-card">
+    <div class="content-header">
+      <h4 class="content-title">Удаление урока</h4>
+    </div>
+
+    <div class="alert alert-danger mb-4">
+      <div class="d-flex">
+        <div class="flex-shrink-0">
+          <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+        </div>
+        <div>
+          <h5 class="alert-heading">Внимание!</h5>
+          <p class="mb-0">Вы собираетесь удалить урок "{{ lesson.title }}" из модуля "{{ module.name }}". Это действие приведет к удалению всех материалов, связанных с этим уроком. Это действие нельзя отменить.</p>
+        </div>
+      </div>
+    </div>
+
     <form method="post">
       {% csrf_token %}
-      <button type="submit" class="btn btn-danger">Удалить</button>
-      <a hx-get="{% url 'construct:lesson' lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Отмена</a>
+      <div class="d-flex justify-content-between">
+        <button hx-get="{% url 'construct:lesson' lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-outline-secondary"><i class="fas fa-times me-1"></i>Отмена</button>
+        <button type="submit" class="btn btn-danger"><i class="fas fa-trash me-1"></i>Удалить урок</button>
+      </div>
     </form>
   </div>
 {% endblock %}

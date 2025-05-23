@@ -1,33 +1,110 @@
 {% extends 'layouts/main.html' %}
+{% load crispy_forms_tags %}
 
 {% block content %}
   <div class="row">
-    {% include 'construct/partials/sidenav.html' %}
+    {% with current_lesson=lesson %}
+      {% include 'construct/partials/sidenav.html' %}
+    {% endwith %}
 
-    <div class="col border">
-      <div class="container mt-5">
-        {% csrf_token %}
-        {{ lesson.order }}
-        {{ lesson.title }}
-        {{ lesson.description }}
-        <button hx-get="{% url 'construct:lesson_edit' lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Редактировать</button>
-        <a hx-get="{% url 'construct:lesson_delete' lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Удалить</a>
-        <br />
-        <h3>Content</h3>
-        <ul>
-          {% for content in contents %}
-            <li>{{ content.content_type.model }}</li>
-            <a hx-get="{% url 'construct:content_edit' lesson_id=lesson.id pk=content.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary">Редактировать контент</a>
-            <a hx-get="{% url 'construct:content_delete' lesson_id=lesson.id pk=content.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary">Удалить контент</a>
-          {% endfor %}
-        </ul>
+    <div class="col-lg-9">
+      <div class="content-card">
+        <div class="content-header">
+          <h4 class="content-title">Урок {{ lesson.order }}: {{ lesson.title }}</h4>
+          <div class="content-actions">
+            <button hx-get="{% url 'construct:lesson_edit' lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-primary"><i class="fas fa-edit me-1"></i>Редактировать</button>
+            <button hx-get="{% url 'construct:lesson_delete' lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-outline-danger"><i class="fas fa-trash me-1"></i>Удалить</button>
+          </div>
+        </div>
 
-        <h3>Добавить новый контент</h3>
-        <div class="button-group">
-          <a hx-get="{% url 'construct:add_text' lesson_id=lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-primary">Добавить текст</a>
-          <a hx-get="{% url 'construct:add_file' lesson_id=lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-primary">Добавить файл</a>
-          <a hx-get="{% url 'construct:add_link' lesson_id=lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-primary">Добавить ссылку</a>
-          <a hx-get="{% url 'construct:add_image' lesson_id=lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-primary">Добавить изображение</a>
+        <div class="bg-light p-4 rounded mb-4">
+          <h5 class="mb-3">Описание урока</h5>
+          <p>{{ lesson.description }}</p>
+        </div>
+
+        <h5 class="mb-3">Содержимое урока</h5>
+
+        {% if contents|length == 0 %}
+          <div class="text-center py-4 bg-light rounded">
+            <i class="fas fa-info-circle fa-2x text-muted mb-3"></i>
+            <h5>Урок пока пуст</h5>
+            <p class="text-muted">Добавьте контент, чтобы наполнить урок материалами.</p>
+          </div>
+        {% else %}
+          <div class="list-group mb-4">
+            {% for content in contents %}
+              <div class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h6 class="mb-0">
+                    {% if content.content_type.model == 'textcontent' %}
+                      <i class="fas fa-file-alt text-primary me-2"></i>Текстовый контент
+                    {% elif content.content_type.model == 'imagecontent' %}
+                      <i class="fas fa-image text-success me-2"></i>Изображение
+                    {% elif content.content_type.model == 'filecontent' %}
+                      <i class="fas fa-file text-warning me-2"></i>Файл
+                    {% elif content.content_type.model == 'linkcontent' %}
+                      <i class="fas fa-link text-info me-2"></i>Ссылка
+                    {% endif %}
+                  </h6>
+                  <div>
+                    <button hx-get="{% url 'construct:content_edit' lesson_id=lesson.id pk=content.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-sm btn-outline-secondary me-1"><i class="fas fa-edit"></i></button>
+                    <button hx-get="{% url 'construct:content_delete' lesson_id=lesson.id pk=content.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                  </div>
+                </div>
+
+                <div class="content-preview p-3 bg-light rounded">
+                  {% if content.content_type.model == 'textcontent' %}
+                    <div class="text-content">{{ content.content_object.text|linebreaks|truncatechars:200 }}</div>
+                  {% elif content.content_type.model == 'imagecontent' %}
+                    <div class="text-center">
+                      <img src="{{ content.content_object.image.url }}" alt="Изображение урока" class="img-fluid rounded" style="max-height: 200px;" />
+                    </div>
+                  {% elif content.content_type.model == 'filecontent' %}
+                    <div class="d-flex align-items-center">
+                      <i class="fas fa-file-download fa-2x text-warning me-3"></i>
+                      <div>
+                        <p class="mb-0">{{ content.content_object.file.name }}</p>
+                        <a href="{{ content.content_object.file.url }}" class="btn btn-sm btn-outline-primary mt-2" download><i class="fas fa-download me-1"></i>Скачать файл</a>
+                      </div>
+                    </div>
+                  {% elif content.content_type.model == 'linkcontent' %}
+                    <div class="d-flex align-items-center">
+                      <i class="fas fa-external-link-alt fa-2x text-info me-3"></i>
+                      <div>
+                        <p class="mb-0">{{ content.content_object.url }}</p>
+                        <a href="{{ content.content_object.url }}" class="btn btn-sm btn-outline-primary mt-2" target="_blank"><i class="fas fa-external-link-alt me-1"></i>Перейти по ссылке</a>
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <h5 class="mb-3">Добавить новый контент</h5>
+
+        <div class="content-type-buttons">
+          <a hx-get="{% url 'construct:add_text' lesson_id=lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="content-type-button">
+            <i class="fas fa-file-alt text-primary"></i>
+            <span>Текст</span>
+          </a>
+          <a hx-get="{% url 'construct:add_image' lesson_id=lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="content-type-button">
+            <i class="fas fa-image text-success"></i>
+            <span>Изображение</span>
+          </a>
+          <a hx-get="{% url 'construct:add_file' lesson_id=lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="content-type-button">
+            <i class="fas fa-file text-warning"></i>
+            <span>Файл</span>
+          </a>
+          <a hx-get="{% url 'construct:add_link' lesson_id=lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="content-type-button">
+            <i class="fas fa-link text-info"></i>
+            <span>Ссылка</span>
+          </a>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+          <button hx-get="{% url 'construct:module' lesson.module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i>Вернуться к модулю</button>
         </div>
       </div>
     </div>

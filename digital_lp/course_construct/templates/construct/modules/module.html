@@ -3,21 +3,88 @@
 
 {% block content %}
   <div class="row">
-    {% include 'construct/partials/sidenav.html' %}
+    {% with current_module=module %}
+      {% include 'construct/partials/sidenav.html' %}
+    {% endwith %}
 
-    <div class="col border">
-      {% csrf_token %}
-      {{ module.order }}<br />
-      {{ module.name }}<br />
-      {{ module.description }}<br />
-      {% for lesson in lessons %}
-        {{ lesson.order }}
-        {{ lesson.title }}<br />
-      {% endfor %}
-      <button hx-get="{% url 'construct:module_edit' module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Редактировать</button>
-      <a hx-get="{% url 'construct:module_delete' module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Удалить</a>
-      <button hx-get="{% url 'construct:lesson_create' module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Добавить урок</button>
-      <button hx-get="{% url 'construct:test_create' module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Добавить тест</button>
+    <div class="col-lg-9">
+      <div class="content-card">
+        <div class="content-header">
+          <h4 class="content-title">Модуль {{ module.order }}: {{ module.name }}</h4>
+          <div class="content-actions">
+            <button hx-get="{% url 'construct:module_edit' module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-primary"><i class="fas fa-edit me-1"></i>Редактировать</button>
+            <button hx-get="{% url 'construct:module_delete' module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-outline-danger"><i class="fas fa-trash me-1"></i>Удалить</button>
+          </div>
+        </div>
+
+        <div class="bg-light p-4 rounded mb-4">
+          <h5 class="mb-3">Описание модуля</h5>
+          <p>{{ module.description }}</p>
+        </div>
+
+        <h5 class="mb-3">Содержание модуля</h5>
+
+        {% if lessons|length == 0 and tests|length == 0 %}
+          <div class="text-center py-4 bg-light rounded">
+            <i class="fas fa-info-circle fa-2x text-muted mb-3"></i>
+            <h5>Модуль пока пуст</h5>
+            <p class="text-muted">Добавьте уроки и тесты, чтобы наполнить модуль содержимым.</p>
+          </div>
+        {% else %}
+          <div class="list-group mb-4">
+            {% for lesson in lessons %}
+              {% if lesson.module.id == module.id %}
+                <div class="list-group-item list-group-item-action">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <i class="fas fa-book text-success me-2"></i>
+                      <span>Урок {{ lesson.order }}: {{ lesson.title }}</span>
+                    </div>
+                    <div>
+                      <button hx-get="{% url 'construct:lesson' lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-sm btn-outline-primary me-1"><i class="fas fa-eye me-1"></i>Просмотр</button>
+                      <button hx-get="{% url 'construct:lesson_edit' lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-sm btn-outline-secondary me-1"><i class="fas fa-edit"></i></button>
+                      <button hx-get="{% url 'construct:lesson_delete' lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+
+            {% for test in tests %}
+              {% if test.module.id == module.id %}
+                <div class="list-group-item list-group-item-action">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <i class="fas fa-tasks text-info me-2"></i>
+                      <span>Тест {{ test.order }}: {{ test.title }}</span>
+                    </div>
+                    <div>
+                      <button hx-get="{% url 'construct:test_detail' test.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-sm btn-outline-primary me-1"><i class="fas fa-eye me-1"></i>Просмотр</button>
+                      <button hx-get="{% url 'construct:test_edit' test.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-sm btn-outline-secondary me-1"><i class="fas fa-edit"></i></button>
+                      <button hx-get="{% url 'construct:test_delete' test.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="content-type-buttons">
+          <a hx-get="{% url 'construct:lesson_create' module_id=module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="content-type-button">
+            <i class="fas fa-book text-success"></i>
+            <span>Добавить урок</span>
+          </a>
+          <a hx-get="{% url 'construct:test_create' module_id=module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="content-type-button">
+            <i class="fas fa-tasks text-info"></i>
+            <span>Добавить тест</span>
+          </a>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+          <button hx-get="{% url 'construct:main' course_id=module.course.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i>Вернуться к курсу</button>
+        </div>
+      </div>
     </div>
   </div>
 {% endblock %}
