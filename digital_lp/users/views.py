@@ -92,12 +92,12 @@ def profile(request, form=None):
 def edit_profile(request):
     user = request.user
     if request.method == "POST":
-        form = UserProfileForm(request.POST, instance=user)
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
-            return redirect("user:profile")
+            return redirect("users:profile")
         return profile(request, form=form)
     else:
         form = UserProfileForm(instance=user)
 
-    return render("user:edit_profile", "users/edit_profile.html", {"form": form})
+    return render(request, "users/edit_profile.html", {"form": form})

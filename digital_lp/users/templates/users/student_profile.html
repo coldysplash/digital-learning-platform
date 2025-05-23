@@ -55,22 +55,6 @@
           </div>
         </div>
       </div>
-
-      <div class="card shadow">
-        <div class="card-header bg-white d-flex justify-content-between align-items-center">
-          <h5 class="card-title mb-0">Мои избранные курсы</h5>
-          <a href="{% url 'learn:favorites' %}" class="btn btn-sm btn-primary"><i class="fas fa-heart me-1"></i>Все избранные</a>
-        </div>
-        <div class="card-body">
-          <!-- This would be populated with actual favorites data -->
-          <div class="text-center py-5">
-            <i class="fas fa-heart fa-4x text-muted mb-3"></i>
-            <h4>Пока нет избранных</h4>
-            <p class="text-muted">Добавляйте курсы в избранное, чтобы быстро получать к ним доступ позже.</p>
-            <a href="{% url 'courses:catalog' %}" class="btn btn-primary mt-2"><i class="fas fa-search me-1"></i>Просмотреть курсы</a>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 {% endblock %}
