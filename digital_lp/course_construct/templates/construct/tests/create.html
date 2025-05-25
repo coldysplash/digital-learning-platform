@@ -1,12 +1,43 @@
+{% extends 'layouts/main.html' %}
 {% load crispy_forms_tags %}
 
-<div class="container mt-5">
-  <form method="post">
-    {% csrf_token %}
-    {{ form.title|as_crispy_field }}
-    {{ form.description|as_crispy_field }}
-    {{ form.passing_score|as_crispy_field }}
-    <button type="submit" class="btn btn-primary mt-3">Сохранить</button>
-    <a hx-get="{% url 'construct:module' module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Отмена</a>
-  </form>
-</div>
+{% block content %}
+  <div class="content-card">
+    <div class="content-header">
+      <h4 class="content-title">Создание нового теста</h4>
+    </div>
+
+    <div class="alert alert-info mb-4">
+      <div class="d-flex">
+        <div class="flex-shrink-0">
+          <i class="fas fa-info-circle fa-2x me-3"></i>
+        </div>
+        <div>
+          <h5 class="alert-heading">Советы по созданию теста</h5>
+          <p class="mb-0">Хороший тест должен проверять понимание материала, а не просто запоминание фактов. Используйте разные типы вопросов и убедитесь, что они соответствуют целям обучения.</p>
+        </div>
+      </div>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="mb-3">{{ form.title|as_crispy_field }}</div>
+
+      <div class="mb-3">
+        {{ form.description|as_crispy_field }}
+        <div class="form-text">Опишите, что будет проверяться в этом тесте и какие знания должны продемонстрировать студенты.</div>
+      </div>
+
+      <div class="mb-4">
+        {{ form.passing_score|as_crispy_field }}
+        <div class="form-text">Укажите минимальное количество правильных ответов для успешного прохождения теста.</div>
+      </div>
+
+      <div class="d-flex justify-content-between">
+        <button hx-get="{% url 'construct:module' module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-outline-secondary"><i class="fas fa-times me-1"></i>Отмена</button>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Сохранить тест</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

@@ -47,7 +47,7 @@
 
           {% if form.instance.file %}
             <div class="mt-3">
-              <p class="mb-2">Текущий файл: {{ form.instance.file.name|split:'/'|last }}</p>
+              <p class="mb-2">Текущий файл: {{ form.instance.file.name }}</p>
               <a href="{{ form.instance.file.url }}" class="btn btn-sm btn-outline-primary" download><i class="fas fa-download me-1"></i>Скачать текущий файл</a>
             </div>
           {% endif %}
@@ -61,7 +61,7 @@
       {% endif %}
 
       <div class="d-flex justify-content-between">
-        <button hx-get="{% url 'construct:lesson' lesson_id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-outline-secondary"><i class="fas fa-times me-1"></i>Отмена</button>
+        <button hx-get="{% url 'construct:lesson' lesson.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-outline-secondary"><i class="fas fa-times me-1"></i>Отмена</button>
         <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Сохранить изменения</button>
       </div>
     </form>

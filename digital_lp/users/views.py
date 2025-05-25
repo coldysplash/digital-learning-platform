@@ -6,6 +6,7 @@ from django.contrib import messages
 
 from .forms import UserRegistrationForm, UserLoginForm, UserProfileForm
 from courses.models import Course
+from learn.models import CourseProgress
 
 
 def redirect_if_authenticated(view_func):
@@ -81,10 +82,12 @@ def profile(request, form=None):
             "users/author_profile.html",
             {"form": form, "courses": author_courses},
         )
+
+    course_progress = CourseProgress.objects.filter(student=user)
     return render(
         request,
         "users/student_profile.html",
-        {"form": form},
+        {"form": form, "progress": course_progress},
     )
 
 

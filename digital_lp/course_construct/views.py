@@ -181,7 +181,7 @@ class BaseContentCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView)
 
     def form_valid(self, form):
         content_object = form.save()
-        lesson = Lesson.objects.get(id=self.kwargs["lesson_id"])
+        lesson = get_object_or_404(Lesson, id=self.kwargs["lesson_id"])
         content_type_obj = ContentType.objects.get_for_model(content_object)
         order = LessonContent.objects.filter(lesson=lesson).count() + 1
         LessonContent.objects.create(
@@ -191,6 +191,11 @@ class BaseContentCreateView(LoginRequiredMixin, AuthorRequiredMixin, CreateView)
             order=order,
         )
         return redirect(reverse_lazy("construct:lesson", kwargs={"pk": lesson.id}))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["lesson"] = get_object_or_404(Lesson, id=self.kwargs["lesson_id"])
+        return context
 
 
 # Представления для создания каждого типа контента
@@ -238,6 +243,11 @@ class ContentUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
         return redirect(
             reverse_lazy("construct:lesson", kwargs={"pk": self.kwargs["lesson_id"]})
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["lesson"] = get_object_or_404(Lesson, id=self.kwargs["lesson_id"])
+        return context
 
 
 # Представление для удаления контента

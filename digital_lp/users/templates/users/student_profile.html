@@ -46,13 +46,45 @@
           <a href="{% url 'learn:student_courses' %}" class="btn btn-sm btn-primary"><i class="fas fa-book-open me-1"></i>Все курсы</a>
         </div>
         <div class="card-body">
-          <!-- This would be populated with actual course progress data -->
-          <div class="text-center py-5">
-            <i class="fas fa-book-reader fa-4x text-muted mb-3"></i>
-            <h4>Начните обучение сегодня</h4>
-            <p class="text-muted">Изучите наш каталог курсов и запишитесь на курсы, чтобы отслеживать свой прогресс здесь.</p>
-            <a href="{% url 'courses:catalog' %}" class="btn btn-primary mt-2"><i class="fas fa-search me-1"></i>Просмотреть курсы</a>
-          </div>
+          {% if progress %}
+            <div class="row g-3">
+              {% for item in progress %}
+                <div class="col-md-6">
+                  <div class="card border">
+                    <div class="card-body p-3">
+                      <div class="d-flex align-items-center mb-2">
+                        <img src="{{ item.course.image.url }}" alt="{{ item.course.name }}" class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;" />
+                        <div class="flex-grow-1">
+                          <h6 class="mb-0">{{ item.course.name }}</h6>
+                          <small class="text-muted">{{ item.course.category.name }}</small>
+                        </div>
+                      </div>
+                      <div class="mb-2">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                          <span class="small">Прогресс</span>
+                          <span class="small fw-bold">{{ item.progress_percentages }}%</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                          <div class="progress-bar bg-success" role="progressbar" style="width: {{ item.progress_percentages }}%" aria-valuenow="{{ item.progress_percentages }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                      </div>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">Записан: {{ item.added_date|date:'d.m.Y' }}</small>
+                        <a href="{% url 'learn:start' item.course.id %}" class="btn btn-sm btn-outline-primary">Продолжить</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-center py-5">
+              <i class="fas fa-book-reader fa-4x text-muted mb-3"></i>
+              <h4>Начните обучение сегодня</h4>
+              <p class="text-muted">Изучите наш каталог курсов и запишитесь на курсы, чтобы отслеживать свой прогресс здесь.</p>
+              <a href="{% url 'courses:catalog' %}" class="btn btn-primary mt-2"><i class="fas fa-search me-1"></i>Просмотреть курсы</a>
+            </div>
+          {% endif %}
         </div>
       </div>
     </div>

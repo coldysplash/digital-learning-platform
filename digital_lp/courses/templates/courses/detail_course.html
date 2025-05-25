@@ -2,302 +2,157 @@
 {% load static %}
 
 {% block content %}
-<div class="card shadow-sm overflow-hidden mb-4">
-  <div class="row g-0">
-    <div class="col-md-8">
-      <div class="card-body p-4 p-md-5">
-        <nav aria-label="breadcrumb" class="mb-4">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'courses:catalog' %}">Курсы</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'courses:catalog' %}?category={{ course.category.slug }}">{{ course.category.name }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ course.name }}</li>
-          </ol>
-        </nav>
-        
-        <h1 class="display-5 fw-bold mb-3">{{ course.name }}</h1>
-        
-        <div class="d-flex align-items-center mb-4">
-          <div class="avatar-sm me-3">
-            {% if course.author.image %}
-              <img src="{{ course.author.image.url }}" alt="{{ course.author.first_name }}" class="rounded-circle" width="48" height="48">
-            {% else %}
-              <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                <span class="text-white">{{ course.author.first_name|first|upper }}</span>
-              </div>
-            {% endif %}
-          </div>
-          <div>
-            <p class="mb-0 fw-bold">{{ course.author.first_name }} {{ course.author.last_name }}</p>
-            <p class="text-muted small mb-0">Автор курса</p>
-          </div>
-          <span class="badge bg-light text-dark ms-auto">{{ course.category.name }}</span>
-        </div>
-        
-        <h5 class="mb-3">Об этом курсе</h5>
-        <p class="mb-4">{{ course.description }}</p>
-        
-        <div class="d-flex flex-wrap gap-3 mb-4">
-          <div class="bg-light rounded p-3 text-center" style="min-width: 120px;">
-            <i class="fas fa-book mb-2 text-primary"></i>
-            <p class="mb-0 small">Несколько модулей</p>
-          </div>
-          <div class="bg-light rounded p-3 text-center" style="min-width: 120px;">
-            <i class="fas fa-certificate mb-2 text-primary"></i>
-            <p class="mb-0 small">Сертификат</p>
-          </div>
-          <div class="bg-light rounded p-3 text-center" style="min-width: 120px;">
-            <i class="fas fa-clock mb-2 text-primary"></i>
-            <p class="mb-0 small">Свой темп</p>
-          </div>
-          <div class="bg-light rounded p-3 text-center" style="min-width: 120px;">
-            <i class="fas fa-infinity mb-2 text-primary"></i>
-            <p class="mb-0 small">Пожизненный доступ</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4 d-flex flex-column">
-      <div class="position-relative">
-        <img src="{{ course.image.url }}" alt="{{ course.name }}" class="img-fluid w-100" style="height: 240px; object-fit: cover;">
-        <div class="position-absolute top-0 end-0 m-3">
-          {% if not is_favorite %}
-            <form method="post" action="{% url 'learn:add_to_favorites' course.id %}">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-light rounded-circle p-2">
-                <i class="far fa-heart"></i>
-              </button>
-            </form>
-          {% else %}
-            <button class="btn btn-light rounded-circle p-2" disabled>
-              <i class="fas fa-heart text-danger"></i>
-            </button>
-          {% endif %}
-        </div>
-      </div>
-      <div class="bg-light p-4 flex-grow-1 d-flex flex-column">
-        <div class="mb-4">
-          <h4 class="mb-3">Детали курса</h4>
-          <div class="d-flex justify-content-between mb-2">
-            <span>Статус:</span>
-            <span class="badge {% if course.available %}bg-success{% else %}bg-secondary{% endif %}">
-              {% if course.available %}Доступен{% else %}Скоро{% endif %}
-            </span>
-          </div>
-          <div class="d-flex justify-content-between mb-2">
-            <span>Проверка:</span>
-            <span class="badge {% if course.verified %}bg-info{% else %}bg-warning{% endif %}">
-              {% if course.verified %}Проверен{% else %}Ожидает проверки{% endif %}
-            </span>
-          </div>
-          <div class="d-flex justify-content-between">
-            <span>Опубликован:</span>
-            <span>{{ course.pub_date|default:"Не опубликован" }}</span>
-          </div>
-        </div>
-        
-        <div class="mt-auto">
-          {% if not is_enrolled %}
-            <form method="post" action="{% url 'learn:enroll_course' course.id %}">
-              {% csrf_token %}
-              <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary btn-lg">
-                  <i class="fas fa-graduation-cap me-2"></i>Записаться
-                </button>
-                {% if not is_favorite %}
-                  <button type="button" class="btn btn-outline-primary" 
-                          onclick="document.getElementById('favorite-form').submit();">
-                    <i class="far fa-heart me-2"></i>Добавить в избранное
-                  </button>
-                {% endif %}
-              </div>
-            </form>
-            {% if not is_favorite %}
-              <form id="favorite-form" method="post" action="{% url 'learn:add_to_favorites' course.id %}" class="d-none">
-                {% csrf_token %}
-              </form>
-            {% endif %}
-          {% else %}
-            <div class="alert alert-success mb-3">
-              <i class="fas fa-check-circle me-2"></i>Вы записаны на этот курс
-            </div>
-            <div class="d-grid">
-              <a href="{% url 'learn:start' course.id %}" class="btn btn-primary btn-lg">
-                <i class="fas fa-play me-2"></i>Продолжить обучение
-              </a>
-            </div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+  <div class="card shadow-sm overflow-hidden mb-4">
+    <div class="row g-0">
+      <div class="col-md-8">
+        <div class="card-body p-4 p-md-5">
+          <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item">
+                <a href="{% url 'courses:catalog' %}">Курсы</a>
+              </li>
+              <li class="breadcrumb-item">
+                <a href="{% url 'courses:catalog' %}?category={{ course.category.slug }}">{{ course.category.name }}</a>
+              </li>
+              <li class="breadcrumb-item active" aria-current="page">{{ course.name }}</li>
+            </ol>
+          </nav>
 
-<div class="row">
-  <div class="col-md-8">
-    <div class="card shadow-sm mb-4">
-      <div class="card-header bg-white">
-        <h5 class="card-title mb-0">Чему вы научитесь</h5>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-6">
-            <ul class="list-unstyled">
-              <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Комплексное содержание курса</li>
-              <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Интерактивные уроки</li>
-              <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Практические упражнения</li>
-            </ul>
+          <h1 class="display-5 fw-bold mb-3">{{ course.name }}</h1>
+
+          <div class="d-flex align-items-center mb-4">
+            <div class="avatar-sm me-3">
+              {% if course.author.image %}
+                <img src="{{ course.author.image.url }}" alt="{{ course.author.first_name }}" class="rounded-circle" width="48" height="48" />
+              {% else %}
+                <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                  <span class="text-white">{{ course.author.first_name|first|upper }}</span>
+                </div>
+              {% endif %}
+            </div>
+            <div>
+              <p class="mb-0 fw-bold">{{ course.author.first_name }} {{ course.author.last_name }}</p>
+              <p class="text-muted small mb-0">Автор курса</p>
+            </div>
+            <span class="badge bg-light text-dark ms-auto">{{ course.category.name }}</span>
           </div>
-          <div class="col-md-6">
-            <ul class="list-unstyled">
-              <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Оценка знаний</li>
-              <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Обучение от экспертов</li>
-              <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Поддержка сообщества</li>
-            </ul>
-          </div>
+
+          <h5 class="mb-3">Об этом курсе</h5>
+          <p class="mb-4">{{ course.description }}</p>
         </div>
       </div>
-    </div>
-    
-    <div class="card shadow-sm">
-      <div class="card-header bg-white">
-        <h5 class="card-title mb-0">Содержание курса</h5>
-      </div>
-      <div class="card-body">
-        <div class="accordion" id="courseContentAccordion">
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#module1">
-                Модуль 1: Введение
-              </button>
-            </h2>
-            <div id="module1" class="accordion-collapse collapse show" data-bs-parent="#courseContentAccordion">
-              <div class="accordion-body">
-                <ul class="list-group list-group-flush">
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                      <i class="fas fa-play-circle me-2 text-primary"></i>
-                      Добро пожаловать на курс
-                    </div>
-                    <span class="badge bg-light text-dark">5 мин</span>
-                  </li>
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                      <i class="fas fa-file-alt me-2 text-primary"></i>
-                      Обзор курса
-                    </div>
-                    <span class="badge bg-light text-dark">10 мин</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#module2">
-                Модуль 2: Основные концепции
-              </button>
-            </h2>
-            <div id="module2" class="accordion-collapse collapse" data-bs-parent="#courseContentAccordion">
-              <div class="accordion-body">
-                <ul class="list-group list-group-flush">
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                      <i class="fas fa-play-circle me-2 text-primary"></i>
-                      Урок 1: Основы
-                    </div>
-                    <span class="badge bg-light text-dark">15 мин</span>
-                  </li>
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                      <i class="fas fa-play-circle me-2 text-primary"></i>
-                      Урок 2: Продвинутые темы
-                    </div>
-                    <span class="badge bg-light text-dark">20 мин</span>
-                  </li>
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                      <i class="fas fa-tasks me-2 text-primary"></i>
-                      Тест по модулю
-                    </div>
-                    <span class="badge bg-light text-dark">10 мин</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="col-md-4">
-    <div class="card shadow-sm mb-4">
-      <div class="card-header bg-white">
-        <h5 class="card-title mb-0">Студенты также смотрели</h5>
-      </div>
-      <div class="card-body p-0">
-        <div class="list-group list-group-flush">
-          <a href="#" class="list-group-item list-group-item-action">
-            <div class="d-flex align-items-center">
-              <div class="flex-shrink-0" style="width: 80px; height: 60px; overflow: hidden;">
-                <img src="{% static 'img/course-placeholder.jpg' %}" alt="Course" class="img-fluid">
-              </div>
-              <div class="flex-grow-1 ms-3">
-                <h6 class="mb-0">Похожий курс 1</h6>
-                <p class="text-muted small mb-0">Название категории</p>
-              </div>
-            </div>
-          </a>
-          <a href="#" class="list-group-item list-group-item-action">
-            <div class="d-flex align-items-center">
-              <div class="flex-shrink-0" style="width: 80px; height: 60px; overflow: hidden;">
-                <img src="{% static 'img/course-placeholder.jpg' %}" alt="Course" class="img-fluid">
-              </div>
-              <div class="flex-grow-1 ms-3">
-                <h6 class="mb-0">Похожий курс 2</h6>
-                <p class="text-muted small mb-0">Название категории</p>
-              </div>
-            </div>
-          </a>
-          <a href="#" class="list-group-item list-group-item-action">
-            <div class="d-flex align-items-center">
-              <div class="flex-shrink-0" style="width: 80px; height: 60px; overflow: hidden;">
-                <img src="{% static 'img/course-placeholder.jpg' %}" alt="Course" class="img-fluid">
-              </div>
-              <div class="flex-grow-1 ms-3">
-                <h6 class="mb-0">Похожий курс 3</h6>
-                <p class="text-muted small mb-0">Название категории</p>
-              </div>
-            </div>
-          </a>
-        </div>
-      </div>
-    </div>
-    
-    <div class="card shadow-sm">
-      <div class="card-header bg-white">
-        <h5 class="card-title mb-0">Об авторе</h5>
-      </div>
-      <div class="card-body">
-        <div class="d-flex align-items-center mb-3">
-          <div class="avatar-sm me-3">
-            {% if course.author.image %}
-              <img src="{{ course.author.image.url }}" alt="{{ course.author.first_name }}" class="rounded-circle" width="64" height="64">
+      <div class="col-md-4 d-flex flex-column">
+        <div class="position-relative">
+          <img src="{{ course.image.url }}" alt="{{ course.name }}" class="img-fluid w-100" style="height: 240px; object-fit: cover;" />
+          <div class="position-absolute top-0 end-0 m-3">
+            {% if not is_favorite %}
+              <form method="post" action="{% url 'learn:add_to_favorites' course.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-light rounded-circle p-2"><i class="far fa-heart"></i></button>
+              </form>
             {% else %}
-              <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
-                <span class="text-white h5 mb-0">{{ course.author.first_name|first|upper }}</span>
+              <button class="btn btn-light rounded-circle p-2" disabled><i class="fas fa-heart text-danger"></i></button>
+            {% endif %}
+          </div>
+        </div>
+        <div class="bg-light p-4 flex-grow-1 d-flex flex-column">
+          <div class="mb-4">
+            <div class="d-flex justify-content-between">
+              <span>Опубликован:</span>
+              <span>{{ course.pub_date|default:'Не опубликован' }}</span>
+            </div>
+          </div>
+
+          <div class="mt-auto">
+            {% if not is_enrolled %}
+              <form method="post" action="{% url 'learn:enroll_course' course.id %}">
+                {% csrf_token %}
+                <div class="d-grid gap-2">
+                  <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-graduation-cap me-2"></i>Записаться</button>
+                  {% if not is_favorite %}
+                    <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('favorite-form').submit();"><i class="far fa-heart me-2"></i>Добавить в избранное</button>
+                  {% endif %}
+                </div>
+              </form>
+              {% if not is_favorite %}
+                <form id="favorite-form" method="post" action="{% url 'learn:add_to_favorites' course.id %}" class="d-none">
+                  {% csrf_token %}
+                </form>
+              {% endif %}
+            {% else %}
+              <div class="alert alert-success mb-3">
+                <i class="fas fa-check-circle me-2"></i>Вы записаны на этот курс
+              </div>
+              <div class="d-grid">
+                <a href="{% url 'learn:start' course.id %}" class="btn btn-primary btn-lg"><i class="fas fa-play me-2"></i>Продолжить обучение</a>
               </div>
             {% endif %}
           </div>
-          <div>
-            <h5 class="mb-0">{{ course.author.first_name }} {{ course.author.last_name }}</h5>
-            <p class="text-muted mb-0">Автор курса</p>
-          </div>
         </div>
-        <p class="mb-0">Опытный преподаватель с обширным опытом в данной области. Увлечен преподаванием и помогает студентам достигать их учебных целей.</p>
       </div>
     </div>
   </div>
-</div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+          <h5 class="card-title mb-0">Чему вы научитесь</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <ul class="list-unstyled">
+                <li class="mb-2">
+                  <i class="fas fa-check text-success me-2"></i> Комплексное содержание курса
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-check text-success me-2"></i> Интерактивные уроки
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-check text-success me-2"></i> Практические упражнения
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <ul class="list-unstyled">
+                <li class="mb-2">
+                  <i class="fas fa-check text-success me-2"></i> Оценка знаний
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-check text-success me-2"></i> Обучение от экспертов
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-check text-success me-2"></i> Поддержка сообщества
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="card-title mb-0">Об авторе</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-3">
+            <div class="avatar-sm me-3">
+              {% if course.author.image %}
+                <img src="{{ course.author.image.url }}" alt="{{ course.author.name }}" class="rounded-circle" width="64" height="64" />
+              {% else %}
+                <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                  <span class="text-white h5 mb-0">{{ course.author.name|first|upper }}</span>
+                </div>
+              {% endif %}
+            </div>
+            <div>
+              <h5 class="mb-0">{{ course.author.name }}</h5>
+              <p class="text-muted mb-0">Автор курса</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

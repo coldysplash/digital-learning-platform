@@ -71,4 +71,4 @@ class AnswerForm(forms.ModelForm):
     class Meta:
         model = Answers
         fields = ["answer", "flag"]
-        labels = {"answer": "Ответ", "flag": "Правильный/Неправильный"}
+        labels = {"answer": "Ответ", "flag": "Правильный"}

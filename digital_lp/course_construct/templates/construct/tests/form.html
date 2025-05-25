@@ -1,12 +1,34 @@
+{% extends 'layouts/main.html' %}
 {% load crispy_forms_tags %}
 
-<div class="container mt-5">
+{% block content %}
+  <div class="content-header">
+    <h4 class="content-title">Редактирование теста</h4>
+  </div>
+
   <form method="post">
     {% csrf_token %}
-    {{ form.title|as_crispy_field }}
-    {{ form.description|as_crispy_field }}
-    {{ form.passing_score|as_crispy_field }}
-    <button type="submit" class="btn btn-primary mt-3">Сохранить изменения</button>
-    <a hx-get="{% url 'construct:test_detail' test.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Отмена</a>
+
+    <div class="mb-3">
+      <label for="{{ form.title.id_for_label }}" class="form-label">Название теста</label>
+      {{ form.title|as_crispy_field }}
+    </div>
+
+    <div class="mb-3">
+      <label for="{{ form.description.id_for_label }}" class="form-label">Описание теста</label>
+      {{ form.description|as_crispy_field }}
+      <div class="form-text">Опишите, что будет проверяться в этом тесте и какие знания должны продемонстрировать студенты.</div>
+    </div>
+
+    <div class="mb-4">
+      <label for="{{ form.passing_score.id_for_label }}" class="form-label">Проходной балл (%)</label>
+      {{ form.passing_score|as_crispy_field }}
+      <div class="form-text">Укажите минимальный процент правильных ответов для успешного прохождения теста.</div>
+    </div>
+
+    <div class="d-flex justify-content-between">
+      <button hx-get="{% url 'construct:test_detail' test.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-outline-secondary"><i class="fas fa-times me-1"></i>Отмена</button>
+      <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Сохранить изменения</button>
+    </div>
   </form>
-</div>
+{% endblock %}

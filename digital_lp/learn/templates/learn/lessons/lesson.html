@@ -32,14 +32,12 @@
                 {% if content.content_type.model == 'textcontent' %}
                   <div class="card border-0">
                     <div class="card-body">
-                      <h5 class="card-title mb-3">Текстовый контент</h5>
                       <div class="text-content">{{ content.content_object.text|linebreaks }}</div>
                     </div>
                   </div>
                 {% elif content.content_type.model == 'imagecontent' %}
                   <div class="card border-0">
                     <div class="card-body">
-                      <h5 class="card-title mb-3">Изображение</h5>
                       <img src="{{ content.content_object.image.url }}" alt="Изображение урока" class="img-fluid rounded" />
                     </div>
                   </div>

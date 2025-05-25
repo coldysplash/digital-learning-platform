@@ -1,23 +1,62 @@
-<div class="container mt-5">
-  {% csrf_token %}
-  {{ question.order }}
-  {{ question.question }}
-  <button hx-get="{% url 'construct:question_edit' pk=question.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Редактировать</button>
-  <form method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Удалить</button>
-  </form>
-  <br />
+{% extends 'layouts/main.html' %}
+{% load crispy_forms_tags %}
 
-  ответы{% for answ in answers %}
-    <ul>
-      <li>{{ answ.answer }}</li>
-      <button hx-get="{% url 'construct:answer_edit' pk=answ.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Редактировать</button>
-      <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Удалить</button>
-      </form>
-    </ul>
-  {% endfor %}
-  <button hx-get="{% url 'construct:answer_create' question_id=question.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Добавить ответ</button>
-</div>
+{% block content %}
+  <div class="content-card">
+    <div class="content-header">
+      <h4 class="content-title">Вопрос {{ question.order }}</h4>
+      <div class="content-actions">
+        <button hx-get="{% url 'construct:question_edit' pk=question.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-primary"><i class="fas fa-edit me-1"></i>Редактировать</button>
+        <form method="post" action="{% url 'construct:question_delete' question.id %}" class="d-inline">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline-danger"><i class="fas fa-trash me-1"></i>Удалить</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="bg-light p-4 rounded mb-4">
+      <h5 class="mb-3">Текст вопроса</h5>
+      <p class="lead">{{ question.question }}</p>
+    </div>
+
+    <h5 class="mb-3">Варианты ответов</h5>
+
+    {% if answers|length == 0 %}
+      <div class="text-center py-4 bg-light rounded">
+        <i class="fas fa-info-circle fa-2x text-muted mb-3"></i>
+        <h5>Пока нет вариантов ответа</h5>
+        <p class="text-muted">Добавьте варианты ответа для этого вопроса.</p>
+      </div>
+    {% else %}
+      <div class="list-group mb-4">
+        {% for answer in answers %}
+          <div class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center">
+                {% if answer.flag %}
+                  <span class="badge bg-success me-2">Правильный</span>
+                {% else %}
+                  <span class="badge bg-secondary me-2">Неправильный</span>
+                {% endif %}
+                <span>{{ answer.answer }}</span>
+              </div>
+              <div>
+                <button hx-get="{% url 'construct:answer_edit' pk=answer.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-sm btn-outline-secondary me-1"><i class="fas fa-edit"></i></button>
+                <form method="post" action="{% url 'construct:answer_delete' answer.id %}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                </form>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <button hx-get="{% url 'construct:answer_create' question_id=question.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="add-content-button"><i class="fas fa-plus me-1"></i>Добавить вариант ответа</button>
+
+    <div class="d-flex justify-content-between mt-4">
+      <button hx-get="{% url 'construct:test_detail' pk=test.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i>Вернуться к тесту</button>
+    </div>
+  </div>
+{% endblock %}

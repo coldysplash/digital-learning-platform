@@ -1,10 +1,37 @@
+{% extends 'layouts/main.html' %}
 {% load crispy_forms_tags %}
 
-<div class="container mt-5">
-  <form method="post">
-    {% csrf_token %}
-    {{ form.question|as_crispy_field }}
-    <button type="submit" class="btn btn-primary mt-3">Сохранить изменения</button>
-    <a hx-get="{% url 'construct:test_detail' pk=test.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-secondary mt-3">Отмена</a>
-  </form>
-</div>
+{% block content %}
+  <div class="content-card">
+    <div class="content-header">
+      <h4 class="content-title">Добавление вопроса в тест "{{ test.title }}"</h4>
+    </div>
+
+    <div class="alert alert-info mb-4">
+      <div class="d-flex">
+        <div class="flex-shrink-0">
+          <i class="fas fa-lightbulb fa-2x me-3"></i>
+        </div>
+        <div>
+          <h5 class="alert-heading">Советы по созданию вопросов</h5>
+          <p class="mb-0">Формулируйте вопросы четко и однозначно. После создания вопроса вы сможете добавить варианты ответов и указать правильный ответ.</p>
+        </div>
+      </div>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="mb-4">
+        <label for="{{ form.question.id_for_label }}" class="form-label">Текст вопроса</label>
+        {{ form.question|as_crispy_field }}
+        <div class="form-text">Введите текст вопроса. Будьте конкретны и избегайте двусмысленности.</div>
+      </div>
+
+      <div class="d-flex justify-content-between">
+        <button hx-get="{% url 'construct:test_detail' pk=test.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-outline-secondary"><i class="fas fa-times me-1"></i>Отмена</button>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Сохранить вопрос</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

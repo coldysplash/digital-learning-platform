@@ -9,6 +9,12 @@ class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = ["name", "description", "image", "category"]
+        labels = {
+            "name": "Название курса",
+            "description": "Описание",
+            "image": "Изображение курса",
+            "category": "Категория",
+        }
 
     def clean_name(self):
         name = self.cleaned_data["name"]
