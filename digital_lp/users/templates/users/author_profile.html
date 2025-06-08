@@ -58,14 +58,22 @@
               {% for course in courses %}
                 <div class="col">
                   <div class="card h-100 border">
-                    <img src="{{ course.image.url }}" alt="{{ course.name }}" class="card-img-top img-course" />
+                    {% if course.image %}
+                      <img src="{{ course.image.url }}" alt="{{ course.name }}" class="card-img-top img-course" />
+                    {% else %}
+                      <img src="{% static 'img/noPhoto.png' %}" class="card-img-top img-course" />
+                    {% endif %}
                     <div class="card-body">
                       <h5 class="card-title">{{ course.name }}</h5>
                       <div class="d-flex mb-3">
                         <span class="badge {% if course.available %}
+                            
                             bg-success
+
                           {% else %}
+                            
                             bg-secondary
+
                           {% endif %} me-2">
                           {% if course.available %}
                             Доступен
@@ -74,9 +82,13 @@
                           {% endif %}
                         </span>
                         <span class="badge {% if course.verified %}
+                            
                             bg-info
+
                           {% else %}
+                            
                             bg-warning
+
                           {% endif %}">
                           {% if course.verified %}
                             Проверен

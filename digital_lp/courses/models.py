@@ -17,7 +17,7 @@ class Category(models.Model):
         return self.name
 
     def get_course_count(self):
-        return Course.objects.filter(category=self).count()
+        return Course.objects.filter(category=self, available=True).count()
 
 
 class Course(models.Model):
