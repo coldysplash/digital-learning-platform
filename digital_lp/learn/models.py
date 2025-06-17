@@ -3,6 +3,8 @@ from django.db import models
 from users.models import User
 from courses.models import Course
 from course_construct.models import Task, Test, Lesson
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class CourseProgress(models.Model):
@@ -61,3 +63,34 @@ class TaskComment(models.Model):
 
     class Meta:
         unique_together = ["author", "task_feedback"]
+
+
+@receiver(post_save, sender=LessonsProgress)
+def update_course_progress(sender, instance, **kwargs):
+    """
+    Обновляет прогресс студента по курсу при изменении статуса прохождения урока.
+    """
+    student = instance.student
+    course = instance.lesson.module.course
+
+    # Получаем все уроки курса
+    lessons = Lesson.objects.filter(module__course=course)
+    total_lessons = lessons.count()
+
+    # Получаем количество пройденных уроков
+    passed_lessons = LessonsProgress.objects.filter(
+        student=student, lesson__in=lessons, passed=True
+    ).count()
+
+    # Вычисляем прогресс в процентах
+    if total_lessons > 0:
+        progress_percentages = (passed_lessons / total_lessons) * 100
+    else:
+        progress_percentages = 0
+
+    # Обновляем или создаем запись в CourseProgress
+    course_progress, created = CourseProgress.objects.get_or_create(
+        student=student, course=course
+    )
+    course_progress.progress_percentages = progress_percentages
+    course_progress.save()

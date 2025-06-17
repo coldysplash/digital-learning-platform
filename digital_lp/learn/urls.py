@@ -23,3 +23,12 @@ urlpatterns += [
     path("lesson/<int:pk>/", views.LessonDetailView.as_view(), name="lesson"),
     path("test/<int:pk>/", views.TestDetailView.as_view(), name="test"),
 ]
+
+# learn lessons
+urlpatterns += [
+    path(
+        "lesson/<int:lesson_id>/complete/",
+        views.CompleteLessonView.as_view(),
+        name="complete_lesson",
+    ),
+]

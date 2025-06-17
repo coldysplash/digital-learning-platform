@@ -2,9 +2,10 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404, render
 from django.views.generic import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views import View
 
 
-from .models import CourseProgress, FavoritesCourses
+from .models import CourseProgress, FavoritesCourses, LessonsProgress
 from courses.models import Course
 from course_construct.views import get_sidebar_context
 from course_construct.models import Module, Lesson, Test, Questions
@@ -86,6 +87,9 @@ class LessonDetailView(LoginRequiredMixin, StudentRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["contents"] = self.object.contents.all()
+        context["progress"] = LessonsProgress.objects.get(
+            lesson=self.object.id, student=self.request.user
+        )
         context.update(get_sidebar_context(self.object.module.course.id))
         return context
 
@@ -102,3 +106,26 @@ class TestDetailView(LoginRequiredMixin, StudentRequiredMixin, DetailView):
             "order"
         )
         return context
+
+
+class CompleteLessonView(LoginRequiredMixin, View):
+    """
+    View для отметки урока как пройденного студентом.
+    """
+
+    def post(self, request, lesson_id):
+        # Получаем урок или возвращаем 404, если он не найден
+        lesson = get_object_or_404(Lesson, id=lesson_id)
+
+        # Получаем или создаем запись в LessonsProgress
+        progress, created = LessonsProgress.objects.get_or_create(
+            student=request.user, lesson=lesson, defaults={"passed": True}
+        )
+
+        # Если запись уже существует, обновляем поле passed
+        if not created:
+            progress.passed = True
+            progress.save()
+
+        # Перенаправляем на страницу урока
+        return redirect("learn:lesson", pk=lesson.id)

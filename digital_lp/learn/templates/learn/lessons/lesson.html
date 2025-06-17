@@ -63,7 +63,16 @@
           <div class="d-flex justify-content-between">
             <button hx-get="{% url 'learn:module' lesson.module.id %}" hx-push-url="true" hx-target="#main" hx-swap="outerHTML" class="btn btn-outline-primary"><i class="fas fa-arrow-left me-1"></i>Вернуться к модулю</button>
 
-            <!-- Next lesson button would go here if we had the next lesson information -->
+            {% if progress.passed %}
+              <div class="alert alert-success mb-3">
+                <i class="fas fa-check-circle me-2"></i>Урок пройден
+              </div>
+            {% else %}
+              <form method="POST" action="{% url 'learn:complete_lesson' lesson_id=lesson.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Завершить урок</button>
+              </form>
+            {% endif %}
             <button class="btn btn-primary">Следующий урок<i class="fas fa-arrow-right ms-1"></i></button>
           </div>
         </div>
