@@ -87,9 +87,13 @@ class LessonDetailView(LoginRequiredMixin, StudentRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["contents"] = self.object.contents.all()
-        context["progress"] = LessonsProgress.objects.get(
+        lesson_progress = LessonsProgress.objects.filter(
             lesson=self.object.id, student=self.request.user
-        )
+        ).first()
+        if lesson_progress:
+            context["progress"] = lesson_progress
+        else:
+            context["progress"] = False
         context.update(get_sidebar_context(self.object.module.course.id))
         return context
 
